@@ -4,7 +4,7 @@
 
 ## Outstanding
 
-- none
+- Full Xcode is not installed or selected on this machine, so xcodebuild and simctl are unavailable for simulator validation.
 
 ## Resolved
 
@@ -12,6 +12,7 @@
 
 ## Implementation Safety
 
+- Once full Xcode is available, the first follow-up should be xcodegen generate, xcodebuild -list, and a simulator build to catch any SwiftUI or project-setting issues.
 - Completed /plan for mobileworm. Defined the app as an iPhone-first SwiftUI shell with WKWebView reuse of EarWorm's existing mobile UI, lightweight saved-server persistence, HTTPS-only validation, and a staged plan for foundation, validation hardening, recovery flows, and TestFlight QA.
 - Do not weaken ATS or add broad insecure-network exceptions unless a real blocker appears during implementation.
 - Treat any attempt to recreate EarWorm screens natively as scope drift unless the web shell proves insufficient.

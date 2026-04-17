@@ -1,0 +1,398 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		08E28C6112053299D8051AE6 /* SavedServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35F45F7AF4965A1B63E7FE19 /* SavedServer.swift */; };
+		34F58BEFA6489F8AE7DAED21 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94926CF37F414D7B7D428488 /* LoadingView.swift */; };
+		405CDFE07E689DCEC1EE80F5 /* RecoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A267C2E6989D83617639A4 /* RecoveryView.swift */; };
+		458FF766296E62BD5C7413DD /* SavedServerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2FF2B802AF4631BA00B461 /* SavedServerStore.swift */; };
+		54251596EA98C853D1E956FB /* EarwormWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA57464664F6CE62C53EF40 /* EarwormWebView.swift */; };
+		7EC3C9EE4D7447D9B1820ECD /* WebContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F31A3186D561435410A00AA1 /* WebContainerView.swift */; };
+		9A0937DB392382AB5CD6882A /* ConnectServerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3F270529C78FF226D2E3510 /* ConnectServerView.swift */; };
+		CA4C605E049BE5EF68220B53 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42CE9DD8647ECBB940FCE688 /* AppModel.swift */; };
+		D4DBD0F919D9D8CB3A92354B /* MobilewormApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E716B5AB2D89DB67665E918 /* MobilewormApp.swift */; };
+		D762B2C46D7A9E3077084116 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551B3098790B88827ED3D54B /* RootView.swift */; };
+		EB357829FB86542DA5CB25F0 /* ServerValidationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695729A4BE43908834C96F13 /* ServerValidationService.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0E716B5AB2D89DB67665E918 /* MobilewormApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobilewormApp.swift; sourceTree = "<group>"; };
+		35F45F7AF4965A1B63E7FE19 /* SavedServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedServer.swift; sourceTree = "<group>"; };
+		42CE9DD8647ECBB940FCE688 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		551B3098790B88827ED3D54B /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		695729A4BE43908834C96F13 /* ServerValidationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerValidationService.swift; sourceTree = "<group>"; };
+		6D916B06156254B41175A3CE /* mobileworm.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = mobileworm.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		94926CF37F414D7B7D428488 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
+		CD2FF2B802AF4631BA00B461 /* SavedServerStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedServerStore.swift; sourceTree = "<group>"; };
+		D3F270529C78FF226D2E3510 /* ConnectServerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectServerView.swift; sourceTree = "<group>"; };
+		DCA57464664F6CE62C53EF40 /* EarwormWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EarwormWebView.swift; sourceTree = "<group>"; };
+		E9A267C2E6989D83617639A4 /* RecoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryView.swift; sourceTree = "<group>"; };
+		F31A3186D561435410A00AA1 /* WebContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebContainerView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		01B55BA8716BCB0045F1A689 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				CD2FF2B802AF4631BA00B461 /* SavedServerStore.swift */,
+				695729A4BE43908834C96F13 /* ServerValidationService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		65F4947A73D7B65BABA5AA26 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				42CE9DD8647ECBB940FCE688 /* AppModel.swift */,
+				0E716B5AB2D89DB67665E918 /* MobilewormApp.swift */,
+				551B3098790B88827ED3D54B /* RootView.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		709DE87EB6E938EF0CF2FD25 /* Recovery */ = {
+			isa = PBXGroup;
+			children = (
+				E9A267C2E6989D83617639A4 /* RecoveryView.swift */,
+			);
+			path = Recovery;
+			sourceTree = "<group>";
+		};
+		7F73838067EC215546769042 /* Web */ = {
+			isa = PBXGroup;
+			children = (
+				DCA57464664F6CE62C53EF40 /* EarwormWebView.swift */,
+				F31A3186D561435410A00AA1 /* WebContainerView.swift */,
+			);
+			path = Web;
+			sourceTree = "<group>";
+		};
+		9AD736429B8919359941565C = {
+			isa = PBXGroup;
+			children = (
+				C9F05AE8663185264837306A /* Mobileworm */,
+				EA970D8E37333CB4A4249133 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A23AADDED45953D76BCFAF24 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				F86727BFBD477532BE6C476C /* Connect */,
+				709DE87EB6E938EF0CF2FD25 /* Recovery */,
+				7F73838067EC215546769042 /* Web */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		C9F05AE8663185264837306A /* Mobileworm */ = {
+			isa = PBXGroup;
+			children = (
+				65F4947A73D7B65BABA5AA26 /* App */,
+				A23AADDED45953D76BCFAF24 /* Features */,
+				F8956113AC865BFA9B7586F8 /* Models */,
+				01B55BA8716BCB0045F1A689 /* Services */,
+				FC4DEAABD1CADC0E263CCC99 /* Shared */,
+			);
+			path = Mobileworm;
+			sourceTree = "<group>";
+		};
+		EA970D8E37333CB4A4249133 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6D916B06156254B41175A3CE /* mobileworm.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F86727BFBD477532BE6C476C /* Connect */ = {
+			isa = PBXGroup;
+			children = (
+				D3F270529C78FF226D2E3510 /* ConnectServerView.swift */,
+			);
+			path = Connect;
+			sourceTree = "<group>";
+		};
+		F8956113AC865BFA9B7586F8 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				35F45F7AF4965A1B63E7FE19 /* SavedServer.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		FC4DEAABD1CADC0E263CCC99 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				94926CF37F414D7B7D428488 /* LoadingView.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		7A579FC99AAD19B6F01D14EF /* mobileworm */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3A148D82DB3F3503E4EB5115 /* Build configuration list for PBXNativeTarget "mobileworm" */;
+			buildPhases = (
+				8A5BA27772A397703245CBB0 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = mobileworm;
+			packageProductDependencies = (
+			);
+			productName = mobileworm;
+			productReference = 6D916B06156254B41175A3CE /* mobileworm.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AD913D3275D1E24F8138B70F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 3C83AB3171BBB37C0AB2452C /* Build configuration list for PBXProject "mobileworm" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 9AD736429B8919359941565C;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = EA970D8E37333CB4A4249133 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				7A579FC99AAD19B6F01D14EF /* mobileworm */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8A5BA27772A397703245CBB0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA4C605E049BE5EF68220B53 /* AppModel.swift in Sources */,
+				9A0937DB392382AB5CD6882A /* ConnectServerView.swift in Sources */,
+				54251596EA98C853D1E956FB /* EarwormWebView.swift in Sources */,
+				34F58BEFA6489F8AE7DAED21 /* LoadingView.swift in Sources */,
+				D4DBD0F919D9D8CB3A92354B /* MobilewormApp.swift in Sources */,
+				405CDFE07E689DCEC1EE80F5 /* RecoveryView.swift in Sources */,
+				D762B2C46D7A9E3077084116 /* RootView.swift in Sources */,
+				08E28C6112053299D8051AE6 /* SavedServer.swift in Sources */,
+				458FF766296E62BD5C7413DD /* SavedServerStore.swift in Sources */,
+				EB357829FB86542DA5CB25F0 /* ServerValidationService.swift in Sources */,
+				7EC3C9EE4D7447D9B1820ECD /* WebContainerView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		2AF0238EF1884F861D3405CC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		B4C22968E5940CB4E1A722A2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = mobileworm;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.sangfroyd.mobileworm;
+				PRODUCT_NAME = mobileworm;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		FA494C3B37CA21390D7992BD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		FD6254EF93190C980C65AEE6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = mobileworm;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.sangfroyd.mobileworm;
+				PRODUCT_NAME = mobileworm;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3A148D82DB3F3503E4EB5115 /* Build configuration list for PBXNativeTarget "mobileworm" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FD6254EF93190C980C65AEE6 /* Debug */,
+				B4C22968E5940CB4E1A722A2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		3C83AB3171BBB37C0AB2452C /* Build configuration list for PBXProject "mobileworm" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2AF0238EF1884F861D3405CC /* Debug */,
+				FA494C3B37CA21390D7992BD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AD913D3275D1E24F8138B70F /* Project object */;
+}

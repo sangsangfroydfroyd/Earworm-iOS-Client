@@ -11,3 +11,9 @@ Thumbs.db
 *.log
 
 # Add stack-specific ignores during implementation.
+
+# Xcode
+DerivedData/
+.build/
+xcuserdata/
+*.xcuserstate

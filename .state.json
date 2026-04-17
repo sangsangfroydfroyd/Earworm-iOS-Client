@@ -4,8 +4,8 @@
   "platform": [
     "iOS"
   ],
-  "stage": 0,
-  "stage_status": "planning_complete",
+  "stage": 1,
+  "stage_status": "foundation_in_progress",
   "stages_completed": [],
   "last_validation": null,
   "validation_results": {},
