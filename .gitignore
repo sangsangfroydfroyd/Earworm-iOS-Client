@@ -1,0 +1,13 @@
+# OS metadata
+.DS_Store
+._*
+Thumbs.db
+
+# Editor folders
+.idea/
+.vscode/
+
+# Local logs
+*.log
+
+# Add stack-specific ignores during implementation.

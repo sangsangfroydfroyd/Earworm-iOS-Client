@@ -1,0 +1,209 @@
+{
+  "main": {
+    "id": "e84761e57f050bd3",
+    "type": "split",
+    "children": [
+      {
+        "id": "480c81ac20077ccd",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "71f8c19d9d03bbaf",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "USER NOTES/Earworm Notes (Bugs & Notes).md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Earworm Notes (Bugs & Notes)"
+            }
+          }
+        ]
+      },
+      {
+        "id": "0f0716d42247ffc0",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "2ac341e67f504b75",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "b81015f8b4a9c3f7",
+    "type": "split",
+    "children": [
+      {
+        "id": "a227cb307bb30fe3",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f93a557f5e35cc29",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "acbdb15bb356b4d1",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "9f8b24a494430000",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "9a00192f818eda81",
+    "type": "split",
+    "children": [
+      {
+        "id": "bd102557223b5356",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "a025a12fc477a4c8",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "USER NOTES/Earworm Notes (Bugs & Notes).md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for Earworm Notes (Bugs & Notes)"
+            }
+          },
+          {
+            "id": "1fe7dfd055063be0",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "USER NOTES/Earworm Notes (Bugs & Notes).md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from Earworm Notes (Bugs & Notes)"
+            }
+          },
+          {
+            "id": "b9ece5bb20ac69af",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "53f0c72ff7f57703",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "520fdc8130bc41fa",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "USER NOTES/Earworm Notes (Bugs & Notes).md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of Earworm Notes (Bugs & Notes)"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "71f8c19d9d03bbaf",
+  "lastOpenFiles": [
+    "Welcome.md",
+    "USER NOTES/Earworm Notes (Bugs & Notes).md",
+    "USER NOTES",
+    "USER NOTES/CLAUDE MAJOR FIXES PLAN 4.1.2026.md"
+  ]
+}

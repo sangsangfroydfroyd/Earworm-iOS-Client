@@ -1,0 +1,8 @@
+wing: mobileworm
+rooms:
+- name: ideas
+  description: Planning contracts and design notes
+- name: obsidianvault
+  description: Operator notes and Obsidian context
+- name: general
+  description: Files that do not fit other rooms
