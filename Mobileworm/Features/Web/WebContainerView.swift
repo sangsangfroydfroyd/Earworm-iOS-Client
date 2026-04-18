@@ -19,6 +19,7 @@ struct WebContainerView: View {
                     )
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .ignoresSafeArea(.container, edges: .top)
                 .safeAreaInset(edge: .bottom, spacing: 0) {
                     if !isAuthenticated {
                         Button {

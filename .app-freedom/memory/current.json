@@ -12,9 +12,9 @@
     "stage": "",
     "status": ""
   },
-  "latest_change_summary": "Updated 12 files",
-  "latest_reason": "Captured after Bash | command: node scripts/open-project.js earworm 2>&1",
-  "latest_outcome": "Working tree changed and was recorded in app memory.",
+  "latest_change_summary": "Finished native fullscreen container follow-up. mobileworm WebContainerView now lets the WKWebView ignore the top safe area so Earworm can render edge-to-edge under the notch/status area. iOS simulator build passed and mobileworm security scan had no findings.",
+  "latest_reason": "Cross-CLI handoff — codex session ended.",
+  "latest_outcome": "Handoff recorded.",
   "blockers": [],
   "unresolved_issues": [],
   "resolved_items": [],
@@ -30,6 +30,8 @@
     ".ideas/open-questions.md",
     "Mobileworm/Features/Web/EarwormWebView.swift",
     "Mobileworm/Features/Web/WebContainerView.swift",
+    "mobileworm.xcodeproj/project.pbxproj",
+    "project.yml",
     ".app-freedom/memory/mempalace/events/2026-04-18T025742953Z-handoff-0fee93/2026-04-18T02-57-42-954Z-handoff-2026-04-18T025742953Z-handoff-0fee93.md",
     ".app-freedom/memory/mempalace/events/2026-04-18T025742953Z-handoff-0fee93/mempalace.yaml",
     ".ideas/decision-log.md",
@@ -37,9 +39,7 @@
     "Mobileworm/App/RootView.swift",
     "Mobileworm/Features/Connect/ConnectServerView.swift",
     "README.md",
-    "mobileworm.xcodeproj/project.pbxproj",
-    ".app-freedom/memory/mempalace/events/2026-04-17T035754912Z-checkpoint-35add6/2026-04-17T03-57-54-913Z-checkpoint-2026-04-17T035754912Z-checkpoint-35add6.md",
-    ".app-freedom/memory/mempalace/events/2026-04-17T035754912Z-checkpoint-35add6/mempalace.yaml"
+    ".app-freedom/memory/mempalace/events/2026-04-17T035754912Z-checkpoint-35add6/2026-04-17T03-57-54-913Z-checkpoint-2026-04-17T035754912Z-checkpoint-35add6.md"
   ],
   "recent_decisions": [
     "Use a native EarWorm-styled login-screen Change Server overlay instead of injecting a DOM button, because the DOM button rendered in WKWebView but simulator taps did not fire its click handler reliably.",
@@ -60,6 +60,8 @@
   ],
   "failed_attempts": [],
   "future_self_notes": [
+    "Finished native fullscreen container follow-up. mobileworm WebContainerView now lets the WKWebView ignore the top safe area so Earworm can render edge-to-edge under the notch/status area. iOS simulator build passed and mobileworm security scan had no findings.",
+    "Made the one permitted mobileworm native-container edit: locked iPhone orientation to portrait in XcodeGen config, preserved signing team in project.yml, added WKWebView zoom/viewport suppression, regenerated the Xcode project, verified the built Info.plist orientation key, passed simulator build, and ran security check with no findings.",
     "Adjusted WKWebView safe-area behavior and moved the unauthenticated Change Server control into a bottom safeAreaInset so the wrapper no longer hard-codes bottom spacing.",
     "Validated that mobileworm still reaches EarWorm's login UI and Change Server flow with the live host. Attempted to continue with the provided test credentials, but simulator automation could not reliably type into the WKWebView login fields, and the Cloudflare tunnel for earworm.sillytina.fun degraded to HTTP 502 during direct login verification.",
     "If auth/status or auth/login start returning Cloudflare 502 during testing, stop attributing the failure to the app until the tunnel/origin is healthy again.",
@@ -80,11 +82,11 @@
   ],
   "last_checkpoint_at": "2026-04-18T01:47:18.364Z",
   "last_session_end_at": "",
-  "last_event_id": "2026-04-18T025915715Z-change-0e0349",
-  "last_event_at": "2026-04-18T02:59:15.715Z",
+  "last_event_id": "2026-04-18T064708272Z-handoff-ff66f3",
+  "last_event_at": "2026-04-18T06:47:08.273Z",
   "last_recorded_fingerprint": {
     "kind": "git-status",
-    "value": "8f7ff54b99d9fd33acb0175b5e2f86436726c3493a10d95b84da06372e5eb825",
+    "value": "9c39e4885101484d78e7def69d042d82459617e8468931c8d94d548eaa24e6b6",
     "dirty": true,
     "changed_files": [
       ".app-freedom/memory/current.json",
@@ -97,10 +99,10 @@
       ".ideas/open-questions.md",
       "Mobileworm/Features/Web/EarwormWebView.swift",
       "Mobileworm/Features/Web/WebContainerView.swift",
-      ".app-freedom/memory/mempalace/events/2026-04-18T025742953Z-handoff-0fee93/2026-04-18T02-57-42-954Z-handoff-2026-04-18T025742953Z-handoff-0fee93.md",
-      ".app-freedom/memory/mempalace/events/2026-04-18T025742953Z-handoff-0fee93/mempalace.yaml"
+      "mobileworm.xcodeproj/project.pbxproj",
+      "project.yml"
     ],
-    "captured_at": "2026-04-18T02:59:15.715Z"
+    "captured_at": "2026-04-18T06:47:08.589Z"
   },
   "warning": {
     "unlogged_changes": false,
@@ -115,10 +117,10 @@
       ".ideas/open-questions.md",
       "Mobileworm/Features/Web/EarwormWebView.swift",
       "Mobileworm/Features/Web/WebContainerView.swift",
-      ".app-freedom/memory/mempalace/events/2026-04-18T025742953Z-handoff-0fee93/2026-04-18T02-57-42-954Z-handoff-2026-04-18T025742953Z-handoff-0fee93.md",
-      ".app-freedom/memory/mempalace/events/2026-04-18T025742953Z-handoff-0fee93/mempalace.yaml"
+      "mobileworm.xcodeproj/project.pbxproj",
+      "project.yml"
     ],
     "message": ""
   },
-  "updated_at": "2026-04-18T02:59:15.868Z"
+  "updated_at": "2026-04-18T06:47:08.463Z"
 }

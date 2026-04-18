@@ -1,9 +1,9 @@
 {
-  "last_attempt_at": "2026-04-18T02:59:15.789Z",
+  "last_attempt_at": "2026-04-18T06:47:08.370Z",
   "last_success_at": "2026-04-18T02:57:49.416Z",
   "last_error": "",
-  "last_note": "MemPalace sync skipped for trigger \"change\" by preference.",
-  "last_trigger": "change",
+  "last_note": "MemPalace is configured as primary, but the wrapper is not available in the current environment. App Freedom snapshots remain available as the fallback backend.",
+  "last_trigger": "handoff",
   "last_export_path": "/Volumes/T7/projects/mobileworm/.app-freedom/memory/mempalace/events/2026-04-18T025742953Z-handoff-0fee93/2026-04-18T02-57-42-954Z-handoff-2026-04-18T025742953Z-handoff-0fee93.md",
   "last_sync_command": "bash /Volumes/T7/claudebuilder/scripts/mempalace.sh mine /Volumes/T7/projects/mobileworm/.app-freedom/memory/mempalace/events/2026-04-18T025742953Z-handoff-0fee93 --mode projects --wing mobileworm --agent app-freedom"
 }

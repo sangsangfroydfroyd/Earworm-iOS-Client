@@ -17,9 +17,11 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.sangfroyd.mobileworm
         PRODUCT_NAME: mobileworm
         TARGETED_DEVICE_FAMILY: 1
+        DEVELOPMENT_TEAM: SX55QKAFL4
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: mobileworm
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.music
         INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
         SUPPORTS_MACCATALYST: NO

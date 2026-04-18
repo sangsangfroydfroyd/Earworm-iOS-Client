@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		08E28C6112053299D8051AE6 /* SavedServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35F45F7AF4965A1B63E7FE19 /* SavedServer.swift */; };
-		1A6F0D2B7C934B81A4E5D601 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A6F0D2B7C934B81A4E5D600 /* Assets.xcassets */; };
 		34F58BEFA6489F8AE7DAED21 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94926CF37F414D7B7D428488 /* LoadingView.swift */; };
 		405CDFE07E689DCEC1EE80F5 /* RecoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A267C2E6989D83617639A4 /* RecoveryView.swift */; };
 		458FF766296E62BD5C7413DD /* SavedServerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2FF2B802AF4631BA00B461 /* SavedServerStore.swift */; };
@@ -16,6 +15,7 @@
 		7EC3C9EE4D7447D9B1820ECD /* WebContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F31A3186D561435410A00AA1 /* WebContainerView.swift */; };
 		9A0937DB392382AB5CD6882A /* ConnectServerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3F270529C78FF226D2E3510 /* ConnectServerView.swift */; };
 		CA4C605E049BE5EF68220B53 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42CE9DD8647ECBB940FCE688 /* AppModel.swift */; };
+		CC49C95B233AD3838F9ABD4D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3BFF0BB0E06D312DD6B515E8 /* Assets.xcassets */; };
 		D4DBD0F919D9D8CB3A92354B /* MobilewormApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E716B5AB2D89DB67665E918 /* MobilewormApp.swift */; };
 		D762B2C46D7A9E3077084116 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551B3098790B88827ED3D54B /* RootView.swift */; };
 		EB357829FB86542DA5CB25F0 /* ServerValidationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695729A4BE43908834C96F13 /* ServerValidationService.swift */; };
@@ -23,12 +23,12 @@
 
 /* Begin PBXFileReference section */
 		0E716B5AB2D89DB67665E918 /* MobilewormApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobilewormApp.swift; sourceTree = "<group>"; };
-		1A6F0D2B7C934B81A4E5D600 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		35F45F7AF4965A1B63E7FE19 /* SavedServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedServer.swift; sourceTree = "<group>"; };
+		3BFF0BB0E06D312DD6B515E8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		42CE9DD8647ECBB940FCE688 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		551B3098790B88827ED3D54B /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		695729A4BE43908834C96F13 /* ServerValidationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerValidationService.swift; sourceTree = "<group>"; };
-		6D916B06156254B41175A3CE /* mobileworm.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = mobileworm.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6D916B06156254B41175A3CE /* mobileworm.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = mobileworm.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		94926CF37F414D7B7D428488 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		CD2FF2B802AF4631BA00B461 /* SavedServerStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedServerStore.swift; sourceTree = "<group>"; };
 		D3F270529C78FF226D2E3510 /* ConnectServerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectServerView.swift; sourceTree = "<group>"; };
@@ -95,7 +95,7 @@
 		C9F05AE8663185264837306A /* Mobileworm */ = {
 			isa = PBXGroup;
 			children = (
-				1A6F0D2B7C934B81A4E5D600 /* Assets.xcassets */,
+				3BFF0BB0E06D312DD6B515E8 /* Assets.xcassets */,
 				65F4947A73D7B65BABA5AA26 /* App */,
 				A23AADDED45953D76BCFAF24 /* Features */,
 				F8956113AC865BFA9B7586F8 /* Models */,
@@ -144,8 +144,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3A148D82DB3F3503E4EB5115 /* Build configuration list for PBXNativeTarget "mobileworm" */;
 			buildPhases = (
-				1A6F0D2B7C934B81A4E5D602 /* Resources */,
 				8A5BA27772A397703245CBB0 /* Sources */,
+				55BCD1B036B71E20475DE9D2 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -166,6 +166,11 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					7A579FC99AAD19B6F01D14EF = {
+						DevelopmentTeam = SX55QKAFL4;
+					};
+				};
 			};
 			buildConfigurationList = 3C83AB3171BBB37C0AB2452C /* Build configuration list for PBXProject "mobileworm" */;
 			developmentRegion = en;
@@ -187,11 +192,11 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		1A6F0D2B7C934B81A4E5D602 /* Resources */ = {
+		55BCD1B036B71E20475DE9D2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1A6F0D2B7C934B81A4E5D601 /* Assets.xcassets in Resources */,
+				CC49C95B233AD3838F9ABD4D /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -293,6 +298,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -373,6 +379,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

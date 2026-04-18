@@ -2,15 +2,11 @@
 
 - App: mobileworm
 - From CLI: codex
-- Timestamp: 2026-04-18T02:57:49.772Z
+- Timestamp: 2026-04-18T06:47:08.655Z
 
 ## What Was Accomplished
 
-Adjusted WKWebView safe-area behavior and moved the unauthenticated Change Server control into a bottom safeAreaInset so the wrapper no longer hard-codes bottom spacing.
-
-## Next Step
-
-Re-run on a healthy iOS simulator and compare login/home/library sizing against Safari on the same device profile.
+Finished native fullscreen container follow-up. mobileworm WebContainerView now lets the WKWebView ignore the top safe area so Earworm can render edge-to-edge under the notch/status area. iOS simulator build passed and mobileworm security scan had no findings.
 
 ## Resume Instructions
 
