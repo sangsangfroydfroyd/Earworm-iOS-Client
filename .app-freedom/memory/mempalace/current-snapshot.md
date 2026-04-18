@@ -1,8 +1,8 @@
 # App Freedom Compatibility Snapshot: mobileworm
 
-Generated: 2026-04-18T02:33:50.639Z
+Generated: 2026-04-18T02:59:15.995Z
 Configured backend: mempalace
-Active backend: app_freedom
+Active backend: mempalace
 
 This file remains as a deterministic App Freedom resume snapshot while MemPalace is the primary long-term memory backend.
 
@@ -16,6 +16,6 @@ Not recorded.
 
 ## Latest Change
 
-Updated 20 files
+Updated 12 files
 
-Next step: Once earworm.sillytina.fun is stable again, either sign in manually in the simulator with testuser/testusertestuser or continue by improving WKWebView login-field automation for simulator testing.
+Next step: Re-run on a healthy iOS simulator and compare login/home/library sizing against Safari on the same device profile.

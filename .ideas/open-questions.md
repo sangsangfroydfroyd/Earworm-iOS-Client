@@ -12,6 +12,7 @@
 
 ## Implementation Safety
 
+- Adjusted WKWebView safe-area behavior and moved the unauthenticated Change Server control into a bottom safeAreaInset so the wrapper no longer hard-codes bottom spacing.
 - Validated that mobileworm still reaches EarWorm's login UI and Change Server flow with the live host. Attempted to continue with the provided test credentials, but simulator automation could not reliably type into the WKWebView login fields, and the Cloudflare tunnel for earworm.sillytina.fun degraded to HTTP 502 during direct login verification.
 - If auth/status or auth/login start returning Cloudflare 502 during testing, stop attributing the failure to the app until the tunnel/origin is healthy again.
 - Live simulator validation now passes for https://earworm.sillytina.fun. The app validates the EarWorm server, saves it, opens EarWorm's existing mobile login UI in WKWebView with no native browser toolbar, and the login-screen Change EarWorm Server control returns to first-launch server entry. Replaced the unreliable DOM-injected change-server button with a native EarWorm-styled overlay shown only while unauthenticated.

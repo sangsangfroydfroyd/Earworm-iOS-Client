@@ -14,9 +14,9 @@ Not recorded.
 
 ## Recent Changes
 
-Updated 20 files
+Updated 12 files
 
-Reason: Captured file-changing work automatically.
+Reason: Captured after Bash | command: node scripts/open-project.js earworm 2>&1
 Outcome: Working tree changed and was recorded in app memory.
 - .app-freedom/memory/current.json
 - .app-freedom/memory/current.md
@@ -25,19 +25,19 @@ Outcome: Working tree changed and was recorded in app memory.
 - .app-freedom/memory/mempalace/current-snapshot.md
 - .app-freedom/memory/mempalace/status.json
 - .handoff.md
-- .ideas/decision-log.md
 - .ideas/open-questions.md
+- Mobileworm/Features/Web/EarwormWebView.swift
+- Mobileworm/Features/Web/WebContainerView.swift
+- .app-freedom/memory/mempalace/events/2026-04-18T025742953Z-handoff-0fee93/2026-04-18T02-57-42-954Z-handoff-2026-04-18T025742953Z-handoff-0fee93.md
+- .app-freedom/memory/mempalace/events/2026-04-18T025742953Z-handoff-0fee93/mempalace.yaml
+- .ideas/decision-log.md
 - .state.json
 - Mobileworm/App/RootView.swift
 - Mobileworm/Features/Connect/ConnectServerView.swift
-- Mobileworm/Features/Web/EarwormWebView.swift
-- Mobileworm/Features/Web/WebContainerView.swift
 - README.md
 - mobileworm.xcodeproj/project.pbxproj
 - .app-freedom/memory/mempalace/events/2026-04-17T035754912Z-checkpoint-35add6/2026-04-17T03-57-54-913Z-checkpoint-2026-04-17T035754912Z-checkpoint-35add6.md
 - .app-freedom/memory/mempalace/events/2026-04-17T035754912Z-checkpoint-35add6/mempalace.yaml
-- .app-freedom/memory/mempalace/events/2026-04-17T035814273Z-checkpoint-b7c8e8/2026-04-17T03-58-14-274Z-checkpoint-2026-04-17T035814273Z-checkpoint-b7c8e8.md
-- .app-freedom/memory/mempalace/events/2026-04-17T035814273Z-checkpoint-b7c8e8/mempalace.yaml
 
 ## Decisions
 
@@ -63,6 +63,7 @@ Outcome: Working tree changed and was recorded in app memory.
 
 ## Failed Attempts / Future-Self Notes
 
+- Adjusted WKWebView safe-area behavior and moved the unauthenticated Change Server control into a bottom safeAreaInset so the wrapper no longer hard-codes bottom spacing.
 - Validated that mobileworm still reaches EarWorm's login UI and Change Server flow with the live host. Attempted to continue with the provided test credentials, but simulator automation could not reliably type into the WKWebView login fields, and the Cloudflare tunnel for earworm.sillytina.fun degraded to HTTP 502 during direct login verification.
 - If auth/status or auth/login start returning Cloudflare 502 during testing, stop attributing the failure to the app until the tunnel/origin is healthy again.
 - Live simulator validation now passes for https://earworm.sillytina.fun. The app validates the EarWorm server, saves it, opens EarWorm's existing mobile login UI in WKWebView with no native browser toolbar, and the login-screen Change EarWorm Server control returns to first-launch server entry. Replaced the unreliable DOM-injected change-server button with a native EarWorm-styled overlay shown only while unauthenticated.
@@ -82,7 +83,7 @@ Outcome: Working tree changed and was recorded in app memory.
 
 ## Next Step
 
-Once earworm.sillytina.fun is stable again, either sign in manually in the simulator with testuser/testusertestuser or continue by improving WKWebView login-field automation for simulator testing.
+Re-run on a healthy iOS simulator and compare login/home/library sizing against Safari on the same device profile.
 
 ## Warning
 

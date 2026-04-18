@@ -2,15 +2,15 @@
 
 - App: mobileworm
 - From CLI: codex
-- Timestamp: 2026-04-18T01:47:40.620Z
+- Timestamp: 2026-04-18T02:57:49.772Z
 
 ## What Was Accomplished
 
-Validated that mobileworm still reaches EarWorm's login UI and Change Server flow with the live host. Attempted to continue with the provided test credentials, but simulator automation could not reliably type into the WKWebView login fields, and the Cloudflare tunnel for earworm.sillytina.fun degraded to HTTP 502 during direct login verification.
+Adjusted WKWebView safe-area behavior and moved the unauthenticated Change Server control into a bottom safeAreaInset so the wrapper no longer hard-codes bottom spacing.
 
 ## Next Step
 
-Once earworm.sillytina.fun is stable again, either sign in manually in the simulator with testuser/testusertestuser or continue by improving WKWebView login-field automation for simulator testing.
+Re-run on a healthy iOS simulator and compare login/home/library sizing against Safari on the same device profile.
 
 ## Resume Instructions
 

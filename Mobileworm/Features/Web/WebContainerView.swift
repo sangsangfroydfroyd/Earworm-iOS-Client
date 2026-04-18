@@ -17,8 +17,9 @@ struct WebContainerView: View {
                         onAuthenticationStateChanged: { isAuthenticated = $0 },
                         onLoadFailure: onLoadFailure
                     )
-                    .ignoresSafeArea(edges: .bottom)
-
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .safeAreaInset(edge: .bottom, spacing: 0) {
                     if !isAuthenticated {
                         Button {
                             isShowingChangeServerDialog = true
@@ -35,10 +36,11 @@ struct WebContainerView: View {
                                 )
                         }
                         .padding(.horizontal, 16)
-                        .padding(.bottom, 104)
+                        .padding(.top, 12)
+                        .padding(.bottom, 12)
+                        .background(.clear)
                     }
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 ContentUnavailableView(
                     "Invalid Server URL",
