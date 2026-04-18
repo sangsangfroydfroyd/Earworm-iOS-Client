@@ -1,8 +1,8 @@
 # App Freedom Compatibility Snapshot: mobileworm
 
-Generated: 2026-04-18T07:13:44.960Z
+Generated: 2026-04-18T19:57:48.796Z
 Configured backend: mempalace
-Active backend: app_freedom
+Active backend: mempalace
 
 This file remains as a deterministic App Freedom resume snapshot while MemPalace is the primary long-term memory backend.
 
@@ -16,6 +16,6 @@ Not recorded.
 
 ## Latest Change
 
-Tightened fullscreen fit after bottom safe-area remained visible. Web destination now ignores safe areas at the RootView route level, RootView hides navigation toolbar and paints a safe fallback background, and WebContainerView uses overlay instead of safeAreaInset for unauthenticated Change Server so the WKWebView is no longer resized by native bottom insets. Simulator build/run and screenshot sanity check passed; security scan had no findings.
+Updated 11 files
 
-Next step: Re-run on a healthy iOS simulator and compare login/home/library sizing against Safari on the same device profile.
+Next step: Have the user relaunch the updated MobileWorm build on device/TestFlight; if the device still shows a gap, collect a fresh screenshot from that build and compare whether the native wrapper or the loaded Earworm web bundle is stale.

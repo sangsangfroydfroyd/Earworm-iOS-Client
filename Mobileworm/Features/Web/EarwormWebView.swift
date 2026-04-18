@@ -25,13 +25,14 @@ struct EarwormWebView: UIViewRepresentable {
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = context.coordinator
         webView.allowsBackForwardNavigationGestures = true
-        webView.scrollView.contentInsetAdjustmentBehavior = .automatic
+        Self.disableNativeInsets(for: webView)
         webView.scrollView.delegate = context.coordinator
         Self.lockZoom(for: webView)
         return webView
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
+        Self.disableNativeInsets(for: webView)
         Self.lockZoom(for: webView)
         guard webView.url?.absoluteString != url.absoluteString else { return }
         webView.load(URLRequest(url: url))
@@ -49,6 +50,13 @@ struct EarwormWebView: UIViewRepresentable {
         scrollView.zoomScale = 1
         scrollView.bouncesZoom = false
         scrollView.pinchGestureRecognizer?.isEnabled = false
+    }
+
+    private static func disableNativeInsets(for webView: WKWebView) {
+        let scrollView = webView.scrollView
+        scrollView.contentInsetAdjustmentBehavior = .never
+        scrollView.contentInset = .zero
+        scrollView.scrollIndicatorInsets = .zero
     }
 
     private static let viewportLockScript = WKUserScript(
