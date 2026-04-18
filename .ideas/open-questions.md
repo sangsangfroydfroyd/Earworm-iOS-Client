@@ -12,6 +12,8 @@
 
 ## Implementation Safety
 
+- Tightened fullscreen fit after bottom safe-area remained visible. Web destination now ignores safe areas at the RootView route level, RootView hides navigation toolbar and paints a safe fallback background, and WebContainerView uses overlay instead of safeAreaInset for unauthenticated Change Server so the WKWebView is no longer resized by native bottom insets. Simulator build/run and screenshot sanity check passed; security scan had no findings.
+- Fixed remaining bottom safe-area bar by moving ignoresSafeArea(.container) onto the WKWebView itself, making the web content edge-to-edge on all sides while keeping native unauthenticated Change Server control in SwiftUI safe-area placement. iOS simulator build passed; mobileworm security scan had no findings.
 - Finished native fullscreen container follow-up. mobileworm WebContainerView now lets the WKWebView ignore the top safe area so Earworm can render edge-to-edge under the notch/status area. iOS simulator build passed and mobileworm security scan had no findings.
 - Made the one permitted mobileworm native-container edit: locked iPhone orientation to portrait in XcodeGen config, preserved signing team in project.yml, added WKWebView zoom/viewport suppression, regenerated the Xcode project, verified the built Info.plist orientation key, passed simulator build, and ran security check with no findings.
 - Adjusted WKWebView safe-area behavior and moved the unauthenticated Change Server control into a bottom safeAreaInset so the wrapper no longer hard-codes bottom spacing.
@@ -30,4 +32,3 @@
 - Completed /dream for mobileworm. Defined the app as an iPhone-first personal-TestFlight wrapper around EarWorm's existing mobile web UI, with first-launch HTTPS server entry, saved-server behavior, change-server recovery, and a WKWebView-based login/app flow.
 - Prefer validating against an explicit EarWorm-specific public endpoint during implementation instead of relying only on loose page-title or HTML checks.
 - Treat Safari fallback as a troubleshooting path for certificate trust and development-time recovery, not the primary experience.
-- Created the external mobileworm app workspace by cloning Earworm-iOS-Client into /Volumes/T7/projects/mobileworm, registering it in App Freedom, scaffolding app-local memory/ideas files, and verifying push-app plan resolves the repo correctly.

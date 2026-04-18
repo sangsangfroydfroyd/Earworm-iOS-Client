@@ -14,7 +14,7 @@ Not recorded.
 
 ## Recent Changes
 
-Finished native fullscreen container follow-up. mobileworm WebContainerView now lets the WKWebView ignore the top safe area so Earworm can render edge-to-edge under the notch/status area. iOS simulator build passed and mobileworm security scan had no findings.
+Tightened fullscreen fit after bottom safe-area remained visible. Web destination now ignores safe areas at the RootView route level, RootView hides navigation toolbar and paints a safe fallback background, and WebContainerView uses overlay instead of safeAreaInset for unauthenticated Change Server so the WKWebView is no longer resized by native bottom insets. Simulator build/run and screenshot sanity check passed; security scan had no findings.
 
 Reason: Cross-CLI handoff — codex session ended.
 Outcome: Handoff recorded.
@@ -26,15 +26,15 @@ Outcome: Handoff recorded.
 - .app-freedom/memory/mempalace/status.json
 - .handoff.md
 - .ideas/open-questions.md
-- Mobileworm/Features/Web/EarwormWebView.swift
+- Mobileworm/App/RootView.swift
 - Mobileworm/Features/Web/WebContainerView.swift
+- Mobileworm/Features/Web/EarwormWebView.swift
 - mobileworm.xcodeproj/project.pbxproj
 - project.yml
 - .app-freedom/memory/mempalace/events/2026-04-18T025742953Z-handoff-0fee93/2026-04-18T02-57-42-954Z-handoff-2026-04-18T025742953Z-handoff-0fee93.md
 - .app-freedom/memory/mempalace/events/2026-04-18T025742953Z-handoff-0fee93/mempalace.yaml
 - .ideas/decision-log.md
 - .state.json
-- Mobileworm/App/RootView.swift
 - Mobileworm/Features/Connect/ConnectServerView.swift
 - README.md
 - .app-freedom/memory/mempalace/events/2026-04-17T035754912Z-checkpoint-35add6/2026-04-17T03-57-54-913Z-checkpoint-2026-04-17T035754912Z-checkpoint-35add6.md
@@ -63,6 +63,8 @@ Outcome: Handoff recorded.
 
 ## Failed Attempts / Future-Self Notes
 
+- Tightened fullscreen fit after bottom safe-area remained visible. Web destination now ignores safe areas at the RootView route level, RootView hides navigation toolbar and paints a safe fallback background, and WebContainerView uses overlay instead of safeAreaInset for unauthenticated Change Server so the WKWebView is no longer resized by native bottom insets. Simulator build/run and screenshot sanity check passed; security scan had no findings.
+- Fixed remaining bottom safe-area bar by moving ignoresSafeArea(.container) onto the WKWebView itself, making the web content edge-to-edge on all sides while keeping native unauthenticated Change Server control in SwiftUI safe-area placement. iOS simulator build passed; mobileworm security scan had no findings.
 - Finished native fullscreen container follow-up. mobileworm WebContainerView now lets the WKWebView ignore the top safe area so Earworm can render edge-to-edge under the notch/status area. iOS simulator build passed and mobileworm security scan had no findings.
 - Made the one permitted mobileworm native-container edit: locked iPhone orientation to portrait in XcodeGen config, preserved signing team in project.yml, added WKWebView zoom/viewport suppression, regenerated the Xcode project, verified the built Info.plist orientation key, passed simulator build, and ran security check with no findings.
 - Adjusted WKWebView safe-area behavior and moved the unauthenticated Change Server control into a bottom safeAreaInset so the wrapper no longer hard-codes bottom spacing.
@@ -81,7 +83,6 @@ Outcome: Handoff recorded.
 - Completed /dream for mobileworm. Defined the app as an iPhone-first personal-TestFlight wrapper around EarWorm's existing mobile web UI, with first-launch HTTPS server entry, saved-server behavior, change-server recovery, and a WKWebView-based login/app flow.
 - Prefer validating against an explicit EarWorm-specific public endpoint during implementation instead of relying only on loose page-title or HTML checks.
 - Treat Safari fallback as a troubleshooting path for certificate trust and development-time recovery, not the primary experience.
-- Created the external mobileworm app workspace by cloning Earworm-iOS-Client into /Volumes/T7/projects/mobileworm, registering it in App Freedom, scaffolding app-local memory/ideas files, and verifying push-app plan resolves the repo correctly.
 
 ## Next Step
 

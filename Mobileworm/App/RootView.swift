@@ -26,6 +26,7 @@ struct RootView: View {
                             appModel.handleWebLoadFailure(message)
                         }
                     )
+                    .ignoresSafeArea(.container)
                 } else {
                     LoadingView()
                 }
@@ -49,5 +50,7 @@ struct RootView: View {
                 )
             }
         }
+        .toolbar(.hidden, for: .navigationBar)
+        .background(Color(red: 0.039, green: 0.039, blue: 0.039).ignoresSafeArea())
     }
 }

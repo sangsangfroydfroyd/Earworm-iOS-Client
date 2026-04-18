@@ -17,10 +17,10 @@ struct WebContainerView: View {
                         onAuthenticationStateChanged: { isAuthenticated = $0 },
                         onLoadFailure: onLoadFailure
                     )
+                    .ignoresSafeArea(.container)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .ignoresSafeArea(.container, edges: .top)
-                .safeAreaInset(edge: .bottom, spacing: 0) {
+                .overlay(alignment: .bottom) {
                     if !isAuthenticated {
                         Button {
                             isShowingChangeServerDialog = true
@@ -38,7 +38,7 @@ struct WebContainerView: View {
                         }
                         .padding(.horizontal, 16)
                         .padding(.top, 12)
-                        .padding(.bottom, 12)
+                        .safeAreaPadding(.bottom, 12)
                         .background(.clear)
                     }
                 }
@@ -50,7 +50,6 @@ struct WebContainerView: View {
                 )
             }
         }
-        .toolbar(.hidden, for: .navigationBar)
         .confirmationDialog(
             "Change Server",
             isPresented: $isShowingChangeServerDialog,

@@ -2,11 +2,11 @@
 
 - App: mobileworm
 - From CLI: codex
-- Timestamp: 2026-04-18T06:47:08.655Z
+- Timestamp: 2026-04-18T07:13:44.966Z
 
 ## What Was Accomplished
 
-Finished native fullscreen container follow-up. mobileworm WebContainerView now lets the WKWebView ignore the top safe area so Earworm can render edge-to-edge under the notch/status area. iOS simulator build passed and mobileworm security scan had no findings.
+Tightened fullscreen fit after bottom safe-area remained visible. Web destination now ignores safe areas at the RootView route level, RootView hides navigation toolbar and paints a safe fallback background, and WebContainerView uses overlay instead of safeAreaInset for unauthenticated Change Server so the WKWebView is no longer resized by native bottom insets. Simulator build/run and screenshot sanity check passed; security scan had no findings.
 
 ## Resume Instructions
 
