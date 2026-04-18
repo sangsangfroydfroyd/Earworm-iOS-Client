@@ -22,10 +22,6 @@ struct RootView: View {
                     WebContainerView(
                         server: server,
                         onChangeServer: appModel.changeServer,
-                        onOpenInSafari: {
-                            guard let url = URL(string: server.baseURL) else { return }
-                            openURL(url)
-                        },
                         onLoadFailure: { message in
                             appModel.handleWebLoadFailure(message)
                         }

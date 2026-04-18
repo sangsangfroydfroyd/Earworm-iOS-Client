@@ -22,7 +22,7 @@ struct ConnectServerView: View {
                 Text("Connect to your EarWorm server")
                     .font(.headline)
 
-                Text("Enter your HTTPS EarWorm URL. After the first connection, mobileworm will remember it.")
+                Text("Enter your HTTPS EarWorm URL once. EarWorm's own mobile login opens next.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)

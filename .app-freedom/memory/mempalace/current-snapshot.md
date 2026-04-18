@@ -1,8 +1,8 @@
 # App Freedom Compatibility Snapshot: mobileworm
 
-Generated: 2026-04-17T02:54:32.058Z
+Generated: 2026-04-18T02:33:50.639Z
 Configured backend: mempalace
-Active backend: mempalace
+Active backend: app_freedom
 
 This file remains as a deterministic App Freedom resume snapshot while MemPalace is the primary long-term memory backend.
 
@@ -16,6 +16,6 @@ Not recorded.
 
 ## Latest Change
 
-Scaffolded the first implementation pass for mobileworm: XcodeGen project spec, SwiftUI app shell, saved-server persistence, EarWorm validation service, WKWebView container, recovery flow, and repo README.
+Updated 20 files
 
-Next step: Install or point to full Xcode, then build mobileworm in the iOS Simulator and fix any compile/runtime issues uncovered there.
+Next step: Once earworm.sillytina.fun is stable again, either sign in manually in the simulator with testuser/testusertestuser or continue by improving WKWebView login-field automation for simulator testing.

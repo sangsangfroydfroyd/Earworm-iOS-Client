@@ -1,0 +1,4 @@
+wing: mobileworm
+rooms:
+- name: general
+  description: App Freedom memory events

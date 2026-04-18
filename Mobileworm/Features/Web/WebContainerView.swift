@@ -3,16 +3,42 @@ import SwiftUI
 struct WebContainerView: View {
     let server: SavedServer
     let onChangeServer: () -> Void
-    let onOpenInSafari: () -> Void
     let onLoadFailure: (String) -> Void
 
     @State private var isShowingChangeServerDialog = false
+    @State private var isAuthenticated = false
 
     var body: some View {
         Group {
             if let url = URL(string: server.baseURL) {
-                EarwormWebView(url: url, onLoadFailure: onLoadFailure)
+                ZStack(alignment: .bottom) {
+                    EarwormWebView(
+                        url: url,
+                        onAuthenticationStateChanged: { isAuthenticated = $0 },
+                        onLoadFailure: onLoadFailure
+                    )
                     .ignoresSafeArea(edges: .bottom)
+
+                    if !isAuthenticated {
+                        Button {
+                            isShowingChangeServerDialog = true
+                        } label: {
+                            Text("Change EarWorm Server")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                        .fill(Color(red: 0.055, green: 0.055, blue: 0.075))
+                                        .stroke(Color.white.opacity(0.12), lineWidth: 1)
+                                )
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 104)
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 ContentUnavailableView(
                     "Invalid Server URL",
@@ -21,19 +47,7 @@ struct WebContainerView: View {
                 )
             }
         }
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button("Open in Safari", action: onOpenInSafari)
-            }
-
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("Change Server") {
-                    isShowingChangeServerDialog = true
-                }
-            }
-        }
-        .navigationTitle(server.displayName)
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .navigationBar)
         .confirmationDialog(
             "Change Server",
             isPresented: $isShowingChangeServerDialog,
@@ -42,7 +56,9 @@ struct WebContainerView: View {
             Button("Change Server", role: .destructive, action: onChangeServer)
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("This clears the saved EarWorm server and returns you to the connection screen.")
+            Text(isAuthenticated
+                ? "This clears the saved EarWorm server and returns you to the connection screen."
+                : "This clears the saved server before you sign in so you can enter a different EarWorm URL.")
         }
     }
 }

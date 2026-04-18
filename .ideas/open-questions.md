@@ -4,7 +4,7 @@
 
 ## Outstanding
 
-- Full Xcode is not installed or selected on this machine, so xcodebuild and simctl are unavailable for simulator validation.
+- none
 
 ## Resolved
 
@@ -12,6 +12,14 @@
 
 ## Implementation Safety
 
+- Validated that mobileworm still reaches EarWorm's login UI and Change Server flow with the live host. Attempted to continue with the provided test credentials, but simulator automation could not reliably type into the WKWebView login fields, and the Cloudflare tunnel for earworm.sillytina.fun degraded to HTTP 502 during direct login verification.
+- If auth/status or auth/login start returning Cloudflare 502 during testing, stop attributing the failure to the app until the tunnel/origin is healthy again.
+- Live simulator validation now passes for https://earworm.sillytina.fun. The app validates the EarWorm server, saves it, opens EarWorm's existing mobile login UI in WKWebView with no native browser toolbar, and the login-screen Change EarWorm Server control returns to first-launch server entry. Replaced the unreliable DOM-injected change-server button with a native EarWorm-styled overlay shown only while unauthenticated.
+- If testing login-screen Change Server, use the accessibility label Change EarWorm Server; coordinate screenshots may not match AX coordinates in the WebView.
+- Validated provided EarWorm URL for mobileworm. Direct HTTPS initially returned EarWorm auth status, but the Cloudflare tunnel then began returning HTTP 530 / error 1033 for both curl and the iOS validator. mobileworm launched in the simulator, accepted the URL, and correctly stayed on first-launch with 'EarWorm returned HTTP 530.'
+- If /api/auth/status returns HTTP 530/Cloudflare 1033, the app is not failing identity validation; Cloudflare cannot reach the EarWorm origin.
+- Aligned mobileworm to use EarWorm's existing mobile web UI by removing native WebView toolbar/title chrome, adding a WebKit bridge that injects an EarWorm-styled Change Server button only on the web login screen, and updating status docs after successful simulator/security validation.
+- The next meaningful runtime test should use a real HTTPS EarWorm server to verify validation, saving, and WKWebView login behavior end-to-end.
 - Once full Xcode is available, the first follow-up should be xcodegen generate, xcodebuild -list, and a simulator build to catch any SwiftUI or project-setting issues.
 - Completed /plan for mobileworm. Defined the app as an iPhone-first SwiftUI shell with WKWebView reuse of EarWorm's existing mobile UI, lightweight saved-server persistence, HTTPS-only validation, and a staged plan for foundation, validation hardening, recovery flows, and TestFlight QA.
 - Do not weaken ATS or add broad insecure-network exceptions unless a real blocker appears during implementation.
