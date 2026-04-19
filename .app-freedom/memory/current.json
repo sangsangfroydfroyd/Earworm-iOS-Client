@@ -12,9 +12,9 @@
     "stage": "",
     "status": ""
   },
-  "latest_change_summary": "Added native WKWebView bridges for original track downloads and lock-screen now-playing metadata/artwork. Downloads use authenticated URLSession writes into Documents/EarWorm Downloads exposed through Files; Info.plist now enables file sharing, opening in place, and audio background mode. Validated with xcodegen, iOS simulator build, built Info.plist inspection, scoped security checks, and simulator launch.",
-  "latest_reason": "Cross-CLI handoff — codex session ended.",
-  "latest_outcome": "Next step: Runtime test against the live EarWorm LAN server: play a track, lock the device, and confirm title/artist/artwork; use a mobile track row menu to download and confirm the file appears in Files > EarWorm > EarWorm Downloads.",
+  "latest_change_summary": "Updated 8 files",
+  "latest_reason": "Captured after Bash | command: cd /Volumes/T7/projects/earworm/src-tauri && for i in 1 2 3 4 5 6 7 8 9 10 11 12; do find /Volumes/T7/projects/.cache...",
+  "latest_outcome": "Working tree changed and was recorded in app memory.",
   "blockers": [
     "Dynamic Island artwork and Files app browse behavior still need physical device or full simulator interaction with a live server to verify end to end."
   ],
@@ -22,18 +22,18 @@
   "resolved_items": [],
   "next_recommended_step": "Runtime test against the live EarWorm LAN server: play a track, lock the device, and confirm title/artist/artwork; use a mobile track row menu to download and confirm the file appears in Files > EarWorm > EarWorm Downloads.",
   "recent_files_touched": [
-    "Mobileworm/Features/Web/EarwormWebView.swift",
-    "mobileworm.xcodeproj/project.pbxproj",
-    "project.yml",
-    "Mobileworm/Features/Web/WebDownloadManager.swift",
-    "Mobileworm/Features/Web/WebNowPlayingManager.swift",
-    "Mobileworm/Info.plist",
     ".app-freedom/memory/current.json",
     ".app-freedom/memory/current.md",
-    ".app-freedom/memory/handoff-latest.md",
     ".app-freedom/memory/history/events.jsonl",
     ".app-freedom/memory/mempalace/current-snapshot.md",
     ".app-freedom/memory/mempalace/status.json",
+    "Mobileworm/Features/Web/EarwormWebView.swift",
+    "Mobileworm/Features/Web/WebDownloadManager.swift",
+    "Mobileworm/Features/Web/WebNowPlayingManager.swift",
+    "mobileworm.xcodeproj/project.pbxproj",
+    "project.yml",
+    "Mobileworm/Info.plist",
+    ".app-freedom/memory/handoff-latest.md",
     ".handoff.md",
     ".ideas/open-questions.md",
     "Mobileworm/Features/Connect/ConnectServerView.swift",
@@ -85,57 +85,37 @@
   ],
   "last_checkpoint_at": "2026-04-18T01:47:18.364Z",
   "last_session_end_at": "",
-  "last_event_id": "2026-04-19T031232121Z-handoff-b8eefc",
-  "last_event_at": "2026-04-19T03:12:32.122Z",
+  "last_event_id": "2026-04-19T065105636Z-change-254962",
+  "last_event_at": "2026-04-19T06:51:05.636Z",
   "last_recorded_fingerprint": {
     "kind": "git-status",
-    "value": "df31eceb814d417445a5bd87da8f92b9d6aeb4e6167e5f40458a2093f232b26e",
+    "value": "15b38333b9de43402ffb3029959be007d7bfed7993354063c4133a0d9892da17",
     "dirty": true,
     "changed_files": [
       ".app-freedom/memory/current.json",
       ".app-freedom/memory/current.md",
-      ".app-freedom/memory/handoff-latest.md",
       ".app-freedom/memory/history/events.jsonl",
       ".app-freedom/memory/mempalace/current-snapshot.md",
       ".app-freedom/memory/mempalace/status.json",
-      ".handoff.md",
-      ".ideas/open-questions.md",
       "Mobileworm/Features/Web/EarwormWebView.swift",
-      "mobileworm.xcodeproj/project.pbxproj",
-      "project.yml",
-      ".app-freedom/memory/mempalace/events/2026-04-19T031033808Z-handoff-aefac4/2026-04-19T03-10-33-808Z-handoff-2026-04-19T031033808Z-handoff-aefac4.md",
-      ".app-freedom/memory/mempalace/events/2026-04-19T031033808Z-handoff-aefac4/mempalace.yaml",
-      ".app-freedom/memory/mempalace/events/2026-04-19T031232121Z-handoff-b8eefc/2026-04-19T03-12-32-122Z-handoff-2026-04-19T031232121Z-handoff-b8eefc.md",
-      ".app-freedom/memory/mempalace/events/2026-04-19T031232121Z-handoff-b8eefc/mempalace.yaml",
       "Mobileworm/Features/Web/WebDownloadManager.swift",
-      "Mobileworm/Features/Web/WebNowPlayingManager.swift",
-      "Mobileworm/Info.plist"
+      "Mobileworm/Features/Web/WebNowPlayingManager.swift"
     ],
-    "captured_at": "2026-04-19T03:13:01.654Z"
+    "captured_at": "2026-04-19T06:51:05.636Z"
   },
   "warning": {
     "unlogged_changes": false,
     "changed_files": [
       ".app-freedom/memory/current.json",
       ".app-freedom/memory/current.md",
-      ".app-freedom/memory/handoff-latest.md",
       ".app-freedom/memory/history/events.jsonl",
       ".app-freedom/memory/mempalace/current-snapshot.md",
       ".app-freedom/memory/mempalace/status.json",
-      ".handoff.md",
-      ".ideas/open-questions.md",
       "Mobileworm/Features/Web/EarwormWebView.swift",
-      "mobileworm.xcodeproj/project.pbxproj",
-      "project.yml",
-      ".app-freedom/memory/mempalace/events/2026-04-19T031033808Z-handoff-aefac4/2026-04-19T03-10-33-808Z-handoff-2026-04-19T031033808Z-handoff-aefac4.md",
-      ".app-freedom/memory/mempalace/events/2026-04-19T031033808Z-handoff-aefac4/mempalace.yaml",
-      ".app-freedom/memory/mempalace/events/2026-04-19T031232121Z-handoff-b8eefc/2026-04-19T03-12-32-122Z-handoff-2026-04-19T031232121Z-handoff-b8eefc.md",
-      ".app-freedom/memory/mempalace/events/2026-04-19T031232121Z-handoff-b8eefc/mempalace.yaml",
       "Mobileworm/Features/Web/WebDownloadManager.swift",
-      "Mobileworm/Features/Web/WebNowPlayingManager.swift",
-      "Mobileworm/Info.plist"
+      "Mobileworm/Features/Web/WebNowPlayingManager.swift"
     ],
     "message": ""
   },
-  "updated_at": "2026-04-19T03:13:01.365Z"
+  "updated_at": "2026-04-19T06:51:05.841Z"
 }

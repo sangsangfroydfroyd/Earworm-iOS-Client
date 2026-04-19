@@ -14,22 +14,22 @@ Not recorded.
 
 ## Recent Changes
 
-Added native WKWebView bridges for original track downloads and lock-screen now-playing metadata/artwork. Downloads use authenticated URLSession writes into Documents/EarWorm Downloads exposed through Files; Info.plist now enables file sharing, opening in place, and audio background mode. Validated with xcodegen, iOS simulator build, built Info.plist inspection, scoped security checks, and simulator launch.
+Updated 8 files
 
-Reason: Cross-CLI handoff — codex session ended.
-Outcome: Next step: Runtime test against the live EarWorm LAN server: play a track, lock the device, and confirm title/artist/artwork; use a mobile track row menu to download and confirm the file appears in Files > EarWorm > EarWorm Downloads.
-- Mobileworm/Features/Web/EarwormWebView.swift
-- mobileworm.xcodeproj/project.pbxproj
-- project.yml
-- Mobileworm/Features/Web/WebDownloadManager.swift
-- Mobileworm/Features/Web/WebNowPlayingManager.swift
-- Mobileworm/Info.plist
+Reason: Captured after Bash | command: cd /Volumes/T7/projects/earworm/src-tauri && for i in 1 2 3 4 5 6 7 8 9 10 11 12; do find /Volumes/T7/projects/.cache...
+Outcome: Working tree changed and was recorded in app memory.
 - .app-freedom/memory/current.json
 - .app-freedom/memory/current.md
-- .app-freedom/memory/handoff-latest.md
 - .app-freedom/memory/history/events.jsonl
 - .app-freedom/memory/mempalace/current-snapshot.md
 - .app-freedom/memory/mempalace/status.json
+- Mobileworm/Features/Web/EarwormWebView.swift
+- Mobileworm/Features/Web/WebDownloadManager.swift
+- Mobileworm/Features/Web/WebNowPlayingManager.swift
+- mobileworm.xcodeproj/project.pbxproj
+- project.yml
+- Mobileworm/Info.plist
+- .app-freedom/memory/handoff-latest.md
 - .handoff.md
 - .ideas/open-questions.md
 - Mobileworm/Features/Connect/ConnectServerView.swift

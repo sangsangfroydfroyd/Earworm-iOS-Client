@@ -18,6 +18,13 @@ struct EarwormWebView: UIViewRepresentable {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .default()
         configuration.defaultWebpagePreferences.allowsContentJavaScript = true
+        configuration.allowsInlineMediaPlayback = true
+        configuration.allowsAirPlayForMediaPlayback = true
+        configuration.mediaTypesRequiringUserActionForPlayback = []
+        configuration.setURLSchemeHandler(
+            MobilewormDownloadSchemeHandler(),
+            forURLScheme: "mobileworm-download"
+        )
         configuration.userContentController.addUserScript(Self.viewportLockScript)
         configuration.userContentController.addUserScript(Self.bridgeScript)
         configuration.userContentController.addUserScript(Self.metadataCacheBridgeScript)
@@ -30,6 +37,7 @@ struct EarwormWebView: UIViewRepresentable {
 
         let webView = WKWebView(frame: .zero, configuration: configuration)
         context.coordinator.webView = webView
+        WebNowPlayingManager.shared.attach(webView: webView)
         webView.navigationDelegate = context.coordinator
         webView.allowsBackForwardNavigationGestures = true
         Self.disableNativeInsets(for: webView)
@@ -50,6 +58,7 @@ struct EarwormWebView: UIViewRepresentable {
         webView.configuration.userContentController.removeScriptMessageHandler(forName: Coordinator.metadataCacheHandler)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: Coordinator.downloadHandler)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: Coordinator.nowPlayingHandler)
+        WebNowPlayingManager.shared.detach(webView: webView)
         webView.scrollView.delegate = nil
         coordinator.webView = nil
     }
@@ -195,7 +204,13 @@ struct EarwormWebView: UIViewRepresentable {
             if (payload.ok) {
               resolve({
                 filename: payload.filename ?? "",
-                path: payload.path ?? null
+                path: payload.path ?? null,
+                localUrl: payload.localUrl ?? null,
+                url: payload.url ?? null,
+                savedCount: payload.savedCount ?? 0,
+                skippedCount: payload.skippedCount ?? 0,
+                downloadedTrackIds: payload.downloadedTrackIds ?? [],
+                downloadedPlaylistIds: payload.downloadedPlaylistIds ?? []
               });
             } else {
               reject(new Error(payload.error || "Download failed"));
@@ -209,6 +224,39 @@ struct EarwormWebView: UIViewRepresentable {
                 pending.set(id, { resolve, reject });
                 downloadHandler.postMessage({
                   action: "downloadTrack",
+                  id,
+                  ...payload
+                });
+              });
+            },
+            downloadPlaylist(payload) {
+              return new Promise((resolve, reject) => {
+                const id = `download-${++nextRequestId}`;
+                pending.set(id, { resolve, reject });
+                downloadHandler.postMessage({
+                  action: "downloadPlaylist",
+                  id,
+                  ...payload
+                });
+              });
+            },
+            getDownloadStatus(payload) {
+              return new Promise((resolve, reject) => {
+                const id = `download-${++nextRequestId}`;
+                pending.set(id, { resolve, reject });
+                downloadHandler.postMessage({
+                  action: "getDownloadStatus",
+                  id,
+                  ...payload
+                });
+              });
+            },
+            getLocalTrackUrl(payload) {
+              return new Promise((resolve, reject) => {
+                const id = `download-${++nextRequestId}`;
+                pending.set(id, { resolve, reject });
+                downloadHandler.postMessage({
+                  action: "getLocalTrackUrl",
                   id,
                   ...payload
                 });
@@ -240,6 +288,12 @@ struct EarwormWebView: UIViewRepresentable {
             clear() {
               nowPlayingHandler.postMessage({ action: "clear" });
             }
+          };
+
+          window.__mobilewormNowPlayingCommand = (command) => {
+            window.dispatchEvent(new CustomEvent("mobileworm:remote-command", {
+              detail: { command }
+            }));
           };
         })();
         """,
@@ -445,17 +499,44 @@ struct EarwormWebView: UIViewRepresentable {
         }
 
         private func handleDownloadMessage(_ body: [String: Any], requestId: String) async {
-            guard (body["action"] as? String) == "downloadTrack" else {
+            guard let action = body["action"] as? String else {
                 await sendDownloadResponse(
                     requestId: requestId,
                     ok: false,
                     filename: nil,
                     path: nil,
+                    localUrl: nil,
+                    savedCount: nil,
+                    skippedCount: nil,
                     errorMessage: "Unknown download action."
                 )
                 return
             }
 
+            switch action {
+            case "downloadTrack":
+                await handleTrackDownloadMessage(body, requestId: requestId)
+            case "downloadPlaylist":
+                await handlePlaylistDownloadMessage(body, requestId: requestId)
+            case "getDownloadStatus":
+                await handleDownloadStatusMessage(body, requestId: requestId)
+            case "getLocalTrackUrl":
+                await handleLocalTrackURLMessage(body, requestId: requestId)
+            default:
+                await sendDownloadResponse(
+                    requestId: requestId,
+                    ok: false,
+                    filename: nil,
+                    path: nil,
+                    localUrl: nil,
+                    savedCount: nil,
+                    skippedCount: nil,
+                    errorMessage: "Unknown download action."
+                )
+            }
+        }
+
+        private func handleTrackDownloadMessage(_ body: [String: Any], requestId: String) async {
             guard
                 let urlString = body["url"] as? String,
                 let sourceURL = URL(string: urlString)
@@ -465,25 +546,33 @@ struct EarwormWebView: UIViewRepresentable {
                     ok: false,
                     filename: nil,
                     path: nil,
+                    localUrl: nil,
+                    savedCount: nil,
+                    skippedCount: nil,
                     errorMessage: "Download URL was missing."
                 )
                 return
             }
 
             let filename = (body["filename"] as? String) ?? "Track.audio"
+            let trackId = intValue(body["trackId"])
             let cookies = await cookies(for: sourceURL)
 
             do {
                 let downloadedFile = try await WebDownloadManager.shared.downloadTrack(
                     from: sourceURL,
                     filename: filename,
-                    cookies: cookies
+                    cookies: cookies,
+                    trackId: trackId
                 )
                 await sendDownloadResponse(
                     requestId: requestId,
                     ok: true,
                     filename: downloadedFile.filename,
                     path: downloadedFile.url.path,
+                    localUrl: downloadedFile.localPlaybackURL,
+                    savedCount: nil,
+                    skippedCount: nil,
                     errorMessage: nil
                 )
             } catch {
@@ -492,9 +581,143 @@ struct EarwormWebView: UIViewRepresentable {
                     ok: false,
                     filename: nil,
                     path: nil,
+                    localUrl: nil,
+                    savedCount: nil,
+                    skippedCount: nil,
                     errorMessage: error.localizedDescription
                 )
             }
+        }
+
+        private func handlePlaylistDownloadMessage(_ body: [String: Any], requestId: String) async {
+            guard let trackPayloads = body["tracks"] as? [[String: Any]] else {
+                await sendDownloadResponse(
+                    requestId: requestId,
+                    ok: false,
+                    filename: nil,
+                    path: nil,
+                    localUrl: nil,
+                    savedCount: nil,
+                    skippedCount: nil,
+                    errorMessage: "Playlist download tracks were missing."
+                )
+                return
+            }
+
+            var downloadRequests: [WebPlaylistTrackDownloadRequest] = []
+            var skippedCount = (body["skippedTrackIds"] as? [Any])?.count ?? 0
+            for payload in trackPayloads {
+                guard
+                    let trackId = intValue(payload["trackId"]),
+                    let urlString = payload["url"] as? String,
+                    let sourceURL = URL(string: urlString),
+                    let filename = payload["filename"] as? String
+                else {
+                    skippedCount += 1
+                    continue
+                }
+
+                let cookies = await cookies(for: sourceURL)
+                downloadRequests.append(WebPlaylistTrackDownloadRequest(
+                    trackId: trackId,
+                    sourceURL: sourceURL,
+                    filename: filename,
+                    cookies: cookies
+                ))
+            }
+
+            let playlistName = (body["playlistName"] as? String) ?? "Playlist"
+            let playlistId = intValue(body["playlistId"])
+            do {
+                let downloadedPlaylist = try await WebDownloadManager.shared.downloadPlaylist(
+                    named: playlistName,
+                    playlistId: playlistId,
+                    tracks: downloadRequests
+                )
+                await sendDownloadResponse(
+                    requestId: requestId,
+                    ok: true,
+                    filename: downloadedPlaylist.folderName,
+                    path: downloadedPlaylist.url.path,
+                    localUrl: nil,
+                    savedCount: downloadedPlaylist.savedCount,
+                    skippedCount: skippedCount + downloadedPlaylist.skippedCount,
+                    errorMessage: nil
+                )
+            } catch {
+                await sendDownloadResponse(
+                    requestId: requestId,
+                    ok: false,
+                    filename: nil,
+                    path: nil,
+                    localUrl: nil,
+                    savedCount: nil,
+                    skippedCount: skippedCount,
+                    errorMessage: error.localizedDescription
+                )
+            }
+        }
+
+        private func handleDownloadStatusMessage(_ body: [String: Any], requestId: String) async {
+            let trackIds = intArrayValue(body["trackIds"])
+            let playlistIds = intArrayValue(body["playlistIds"])
+            let downloadedTrackIds = await WebDownloadManager.shared.downloadedTrackIds(from: trackIds)
+            let downloadedPlaylistIds = await WebDownloadManager.shared.downloadedPlaylistIds(from: playlistIds)
+            await sendDownloadStatusResponse(
+                requestId: requestId,
+                ok: true,
+                downloadedTrackIds: downloadedTrackIds,
+                downloadedPlaylistIds: downloadedPlaylistIds,
+                localUrl: nil,
+                errorMessage: nil
+            )
+        }
+
+        private func handleLocalTrackURLMessage(_ body: [String: Any], requestId: String) async {
+            guard let trackId = intValue(body["trackId"]) else {
+                await sendDownloadStatusResponse(
+                    requestId: requestId,
+                    ok: false,
+                    downloadedTrackIds: [],
+                    downloadedPlaylistIds: [],
+                    localUrl: nil,
+                    errorMessage: "Track id was missing."
+                )
+                return
+            }
+
+            let localUrl = await WebDownloadManager.shared.localPlaybackURLString(trackId: trackId)
+            await sendDownloadStatusResponse(
+                requestId: requestId,
+                ok: true,
+                downloadedTrackIds: [],
+                downloadedPlaylistIds: [],
+                localUrl: localUrl,
+                errorMessage: nil
+            )
+        }
+
+        private func intValue(_ value: Any?) -> Int? {
+            if let value = value as? Int {
+                return value
+            }
+            if let value = value as? NSNumber {
+                return value.intValue
+            }
+            return nil
+        }
+
+        private func intArrayValue(_ value: Any?) -> [Int] {
+            if let values = value as? [Int] {
+                return values
+            }
+            if let values = value as? [NSNumber] {
+                return values.map(\.intValue)
+            }
+            if let values = value as? [Any] {
+                return values.compactMap(intValue)
+            }
+            return []
         }
 
         private func cookies(for url: URL?) async -> [HTTPCookie] {
@@ -571,6 +794,9 @@ struct EarwormWebView: UIViewRepresentable {
             ok: Bool,
             filename: String?,
             path: String?,
+            localUrl: String?,
+            savedCount: Int?,
+            skippedCount: Int?,
             errorMessage: String?
         ) {
             let payload: [String: Any] = [
@@ -578,6 +804,38 @@ struct EarwormWebView: UIViewRepresentable {
                 "ok": ok,
                 "filename": filename ?? NSNull(),
                 "path": path ?? NSNull(),
+                "localUrl": localUrl ?? NSNull(),
+                "savedCount": savedCount ?? NSNull(),
+                "skippedCount": skippedCount ?? NSNull(),
+                "error": errorMessage ?? NSNull(),
+            ]
+
+            guard
+                let webView,
+                let payloadData = try? JSONSerialization.data(withJSONObject: payload),
+                let payloadString = String(data: payloadData, encoding: .utf8)
+            else {
+                return
+            }
+
+            webView.evaluateJavaScript("window.__mobilewormDownloadBridgeResolve?.(\(payloadString))")
+        }
+
+        @MainActor
+        private func sendDownloadStatusResponse(
+            requestId: String,
+            ok: Bool,
+            downloadedTrackIds: [Int],
+            downloadedPlaylistIds: [Int],
+            localUrl: String?,
+            errorMessage: String?
+        ) {
+            let payload: [String: Any] = [
+                "id": requestId,
+                "ok": ok,
+                "downloadedTrackIds": downloadedTrackIds,
+                "downloadedPlaylistIds": downloadedPlaylistIds,
+                "url": localUrl ?? NSNull(),
                 "error": errorMessage ?? NSNull(),
             ]
 

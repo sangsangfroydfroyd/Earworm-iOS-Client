@@ -2,6 +2,7 @@ import AVFoundation
 import Foundation
 import MediaPlayer
 import UIKit
+import WebKit
 
 struct WebNowPlayingPayload {
     let title: String
@@ -44,6 +45,20 @@ final class WebNowPlayingManager {
     private var artworkCache: [String: MPMediaItemArtwork] = [:]
     private var artworkTask: Task<Void, Never>?
     private var currentArtworkURLString: String?
+    private weak var webView: WKWebView?
+    private var remoteCommandsConfigured = false
+
+    func attach(webView: WKWebView) {
+        self.webView = webView
+        activateAudioSession()
+        configureRemoteCommands()
+    }
+
+    func detach(webView: WKWebView) {
+        if self.webView === webView {
+            self.webView = nil
+        }
+    }
 
     func update(payload: WebNowPlayingPayload, cookies: [HTTPCookie]) {
         activateAudioSession()
@@ -107,6 +122,7 @@ final class WebNowPlayingManager {
             MPMediaItemPropertyArtist: payload.artistName,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: max(0, payload.position),
             MPNowPlayingInfoPropertyPlaybackRate: payload.isPlaying ? 1.0 : 0.0,
+            MPNowPlayingInfoPropertyMediaType: MPNowPlayingInfoMediaType.audio.rawValue,
         ]
 
         if let albumTitle = payload.albumTitle, !albumTitle.isEmpty {
@@ -128,6 +144,57 @@ final class WebNowPlayingManager {
         } catch {
             return
         }
+    }
+
+    private func configureRemoteCommands() {
+        guard !remoteCommandsConfigured else {
+            return
+        }
+
+        remoteCommandsConfigured = true
+        let commandCenter = MPRemoteCommandCenter.shared()
+
+        commandCenter.playCommand.isEnabled = true
+        commandCenter.pauseCommand.isEnabled = true
+        commandCenter.togglePlayPauseCommand.isEnabled = true
+        commandCenter.nextTrackCommand.isEnabled = true
+        commandCenter.previousTrackCommand.isEnabled = true
+
+        commandCenter.seekForwardCommand.isEnabled = false
+        commandCenter.seekBackwardCommand.isEnabled = false
+        commandCenter.skipForwardCommand.isEnabled = false
+        commandCenter.skipBackwardCommand.isEnabled = false
+        commandCenter.changePlaybackPositionCommand.isEnabled = false
+
+        addCommandTarget(commandCenter.playCommand, command: "play")
+        addCommandTarget(commandCenter.pauseCommand, command: "pause")
+        addCommandTarget(commandCenter.togglePlayPauseCommand, command: "togglePlayPause")
+        addCommandTarget(commandCenter.nextTrackCommand, command: "nextTrack")
+        addCommandTarget(commandCenter.previousTrackCommand, command: "previousTrack")
+    }
+
+    private func addCommandTarget(_ remoteCommand: MPRemoteCommand, command: String) {
+        remoteCommand.addTarget { [weak self] _ in
+            Task { @MainActor in
+                self?.dispatchRemoteCommand(command)
+            }
+            return .success
+        }
+    }
+
+    private func dispatchRemoteCommand(_ command: String) {
+        guard
+            let webView,
+            let payloadData = try? JSONSerialization.data(
+                withJSONObject: command,
+                options: [.fragmentsAllowed]
+            ),
+            let payloadString = String(data: payloadData, encoding: .utf8)
+        else {
+            return
+        }
+
+        webView.evaluateJavaScript("window.__mobilewormNowPlayingCommand?.(\(payloadString))")
     }
 
     nonisolated private static func fetchArtworkData(from url: URL, cookies: [HTTPCookie]) async throws -> Data {
