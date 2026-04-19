@@ -1,9 +1,9 @@
 {
-  "last_attempt_at": "2026-04-19T00:01:25.653Z",
-  "last_success_at": "2026-04-19T00:01:25.653Z",
+  "last_attempt_at": "2026-04-19T03:13:01.059Z",
+  "last_success_at": "2026-04-19T03:13:01.059Z",
   "last_error": "",
   "last_note": "",
   "last_trigger": "handoff",
-  "last_export_path": "/Volumes/T7/projects/mobileworm/.app-freedom/memory/mempalace/events/2026-04-19T000105608Z-handoff-fda75c/2026-04-19T00-01-05-608Z-handoff-2026-04-19T000105608Z-handoff-fda75c.md",
-  "last_sync_command": "bash /Volumes/T7/claudebuilder/scripts/mempalace.sh mine /Volumes/T7/projects/mobileworm/.app-freedom/memory/mempalace/events/2026-04-19T000105608Z-handoff-fda75c --mode projects --wing mobileworm --agent app-freedom"
+  "last_export_path": "/Volumes/T7/projects/mobileworm/.app-freedom/memory/mempalace/events/2026-04-19T031232121Z-handoff-b8eefc/2026-04-19T03-12-32-122Z-handoff-2026-04-19T031232121Z-handoff-b8eefc.md",
+  "last_sync_command": "bash /Volumes/T7/claudebuilder/scripts/mempalace.sh mine /Volumes/T7/projects/mobileworm/.app-freedom/memory/mempalace/events/2026-04-19T031232121Z-handoff-b8eefc --mode projects --wing mobileworm --agent app-freedom"
 }

@@ -21,8 +21,12 @@ struct EarwormWebView: UIViewRepresentable {
         configuration.userContentController.addUserScript(Self.viewportLockScript)
         configuration.userContentController.addUserScript(Self.bridgeScript)
         configuration.userContentController.addUserScript(Self.metadataCacheBridgeScript)
+        configuration.userContentController.addUserScript(Self.downloadBridgeScript)
+        configuration.userContentController.addUserScript(Self.nowPlayingBridgeScript)
         configuration.userContentController.add(context.coordinator, name: Coordinator.authStateHandler)
         configuration.userContentController.add(context.coordinator, name: Coordinator.metadataCacheHandler)
+        configuration.userContentController.add(context.coordinator, name: Coordinator.downloadHandler)
+        configuration.userContentController.add(context.coordinator, name: Coordinator.nowPlayingHandler)
 
         let webView = WKWebView(frame: .zero, configuration: configuration)
         context.coordinator.webView = webView
@@ -44,6 +48,8 @@ struct EarwormWebView: UIViewRepresentable {
     static func dismantleUIView(_ webView: WKWebView, coordinator: Coordinator) {
         webView.configuration.userContentController.removeScriptMessageHandler(forName: Coordinator.authStateHandler)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: Coordinator.metadataCacheHandler)
+        webView.configuration.userContentController.removeScriptMessageHandler(forName: Coordinator.downloadHandler)
+        webView.configuration.userContentController.removeScriptMessageHandler(forName: Coordinator.nowPlayingHandler)
         webView.scrollView.delegate = nil
         coordinator.webView = nil
     }
@@ -166,6 +172,81 @@ struct EarwormWebView: UIViewRepresentable {
         forMainFrameOnly: true
     )
 
+    private static let downloadBridgeScript = WKUserScript(
+        source: """
+        (() => {
+          const downloadHandler = window.webkit?.messageHandlers?.mobilewormDownloads;
+          if (!downloadHandler || window.__mobilewormDownloadBridgeInstalled) {
+            return;
+          }
+
+          window.__mobilewormDownloadBridgeInstalled = true;
+          let nextRequestId = 0;
+          const pending = new Map();
+
+          window.__mobilewormDownloadBridgeResolve = (payload) => {
+            const requestId = payload?.id;
+            if (!requestId || !pending.has(requestId)) {
+              return;
+            }
+
+            const { resolve, reject } = pending.get(requestId);
+            pending.delete(requestId);
+            if (payload.ok) {
+              resolve({
+                filename: payload.filename ?? "",
+                path: payload.path ?? null
+              });
+            } else {
+              reject(new Error(payload.error || "Download failed"));
+            }
+          };
+
+          window.__mobilewormDownloads = {
+            downloadTrack(payload) {
+              return new Promise((resolve, reject) => {
+                const id = `download-${++nextRequestId}`;
+                pending.set(id, { resolve, reject });
+                downloadHandler.postMessage({
+                  action: "downloadTrack",
+                  id,
+                  ...payload
+                });
+              });
+            }
+          };
+        })();
+        """,
+        injectionTime: .atDocumentStart,
+        forMainFrameOnly: true
+    )
+
+    private static let nowPlayingBridgeScript = WKUserScript(
+        source: """
+        (() => {
+          const nowPlayingHandler = window.webkit?.messageHandlers?.mobilewormNowPlaying;
+          if (!nowPlayingHandler || window.__mobilewormNowPlayingBridgeInstalled) {
+            return;
+          }
+
+          window.__mobilewormNowPlayingBridgeInstalled = true;
+          window.__mobilewormNowPlaying = {
+            update(payload) {
+              nowPlayingHandler.postMessage({
+                action: "update",
+                ...payload
+              });
+            },
+            clear() {
+              nowPlayingHandler.postMessage({ action: "clear" });
+            }
+          };
+        })();
+        """,
+        injectionTime: .atDocumentStart,
+        forMainFrameOnly: true
+    )
+
     private static let bridgeScript = WKUserScript(
         source: """
         (() => {
@@ -230,6 +311,8 @@ struct EarwormWebView: UIViewRepresentable {
     final class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler, UIScrollViewDelegate {
         static let authStateHandler = "mobilewormAuthState"
         static let metadataCacheHandler = "mobilewormMetadataCache"
+        static let downloadHandler = "mobilewormDownloads"
+        static let nowPlayingHandler = "mobilewormNowPlaying"
 
         private let onAuthenticationStateChanged: (Bool) -> Void
         private let onLoadFailure: (String) -> Void
@@ -322,9 +405,131 @@ struct EarwormWebView: UIViewRepresentable {
                         }
                     }
                 }
+            case Self.downloadHandler:
+                guard
+                    let body = message.body as? [String: Any],
+                    let requestId = body["id"] as? String
+                else {
+                    return
+                }
+
+                Task {
+                    await handleDownloadMessage(body, requestId: requestId)
+                }
+            case Self.nowPlayingHandler:
+                guard
+                    let body = message.body as? [String: Any],
+                    let action = body["action"] as? String
+                else {
+                    return
+                }
+
+                if action == "clear" {
+                    Task {
+                        await WebNowPlayingManager.shared.clear()
+                    }
+                    return
+                }
+
+                guard action == "update", let payload = WebNowPlayingPayload(messageBody: body) else {
+                    return
+                }
+
+                Task {
+                    let cookies = await cookies(for: payload.artworkURL)
+                    await WebNowPlayingManager.shared.update(payload: payload, cookies: cookies)
+                }
             default:
                 break
             }
+        }
+
+        private func handleDownloadMessage(_ body: [String: Any], requestId: String) async {
+            guard (body["action"] as? String) == "downloadTrack" else {
+                await sendDownloadResponse(
+                    requestId: requestId,
+                    ok: false,
+                    filename: nil,
+                    path: nil,
+                    errorMessage: "Unknown download action."
+                )
+                return
+            }
+
+            guard
+                let urlString = body["url"] as? String,
+                let sourceURL = URL(string: urlString)
+            else {
+                await sendDownloadResponse(
+                    requestId: requestId,
+                    ok: false,
+                    filename: nil,
+                    path: nil,
+                    errorMessage: "Download URL was missing."
+                )
+                return
+            }
+
+            let filename = (body["filename"] as? String) ?? "Track.audio"
+            let cookies = await cookies(for: sourceURL)
+
+            do {
+                let downloadedFile = try await WebDownloadManager.shared.downloadTrack(
+                    from: sourceURL,
+                    filename: filename,
+                    cookies: cookies
+                )
+                await sendDownloadResponse(
+                    requestId: requestId,
+                    ok: true,
+                    filename: downloadedFile.filename,
+                    path: downloadedFile.url.path,
+                    errorMessage: nil
+                )
+            } catch {
+                await sendDownloadResponse(
+                    requestId: requestId,
+                    ok: false,
+                    filename: nil,
+                    path: nil,
+                    errorMessage: error.localizedDescription
+                )
+            }
+        }
+
+        private func cookies(for url: URL?) async -> [HTTPCookie] {
+            guard let cookieStore = await MainActor.run(body: {
+                webView?.configuration.websiteDataStore.httpCookieStore
+            }) else {
+                return []
+            }
+
+            let cookies = await withCheckedContinuation { continuation in
+                cookieStore.getAllCookies { cookies in
+                    continuation.resume(returning: cookies)
+                }
+            }
+
+            guard let url else {
+                return cookies
+            }
+
+            return cookies.filter { cookie in
+                cookieMatches(cookie, url: url)
+            }
+        }
+
+        private func cookieMatches(_ cookie: HTTPCookie, url: URL) -> Bool {
+            guard let host = url.host?.lowercased() else {
+                return false
+            }
+
+            let domain = cookie.domain
+                .trimmingCharacters(in: CharacterSet(charactersIn: "."))
+                .lowercased()
+            let hostMatches = host == domain || host.hasSuffix(".\(domain)")
+            let pathMatches = url.path.hasPrefix(cookie.path)
+            return hostMatches && pathMatches
         }
 
         private func handleLoadFailure(_ error: Error) {
@@ -358,6 +563,33 @@ struct EarwormWebView: UIViewRepresentable {
             }
 
             webView.evaluateJavaScript("window.__mobilewormMetadataCacheBridgeResolve?.(\(payloadString))")
+        }
+
+        @MainActor
+        private func sendDownloadResponse(
+            requestId: String,
+            ok: Bool,
+            filename: String?,
+            path: String?,
+            errorMessage: String?
+        ) {
+            let payload: [String: Any] = [
+                "id": requestId,
+                "ok": ok,
+                "filename": filename ?? NSNull(),
+                "path": path ?? NSNull(),
+                "error": errorMessage ?? NSNull(),
+            ]
+
+            guard
+                let webView,
+                let payloadData = try? JSONSerialization.data(withJSONObject: payload),
+                let payloadString = String(data: payloadData, encoding: .utf8)
+            else {
+                return
+            }
+
+            webView.evaluateJavaScript("window.__mobilewormDownloadBridgeResolve?.(\(payloadString))")
         }
     }
 }

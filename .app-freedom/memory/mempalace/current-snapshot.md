@@ -1,6 +1,6 @@
 # App Freedom Compatibility Snapshot: mobileworm
 
-Generated: 2026-04-19T00:01:26.141Z
+Generated: 2026-04-19T03:13:02.053Z
 Configured backend: mempalace
 Active backend: mempalace
 
@@ -16,6 +16,6 @@ Not recorded.
 
 ## Latest Change
 
-Removed the brittle WKWebView artwork interception that blanked EarWorm images and replaced it with a native metadata cache bridge. MobileWorm now injects a bridge for cached EarWorm JSON payloads, persists those snapshots in the app cache directory, keeps native safe-area handling intact, and surfaces EarWorm branding in the iOS shell. Xcode 26.4 build passed, mobileworm security scan had no findings, and the simulator now renders the real EarWorm Home screen with artwork tiles again.
+Added native WKWebView bridges for original track downloads and lock-screen now-playing metadata/artwork. Downloads use authenticated URLSession writes into Documents/EarWorm Downloads exposed through Files; Info.plist now enables file sharing, opening in place, and audio background mode. Validated with xcodegen, iOS simulator build, built Info.plist inspection, scoped security checks, and simulator launch.
 
-Next step: Exercise one confirmed playback start against the host from the simulator or device and watch whether any metadata screen needs a shorter cache lifetime.
+Next step: Runtime test against the live EarWorm LAN server: play a track, lock the device, and confirm title/artist/artwork; use a mobile track row menu to download and confirm the file appears in Files > EarWorm > EarWorm Downloads.
