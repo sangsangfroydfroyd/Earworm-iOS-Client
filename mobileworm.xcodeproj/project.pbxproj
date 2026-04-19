@@ -14,6 +14,7 @@
 		54251596EA98C853D1E956FB /* EarwormWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA57464664F6CE62C53EF40 /* EarwormWebView.swift */; };
 		7EC3C9EE4D7447D9B1820ECD /* WebContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F31A3186D561435410A00AA1 /* WebContainerView.swift */; };
 		9A0937DB392382AB5CD6882A /* ConnectServerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3F270529C78FF226D2E3510 /* ConnectServerView.swift */; };
+		C9FF435ACFF765ACEAEE0E5D /* WebMetadataCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 690230D296E2F217324D0ECC /* WebMetadataCache.swift */; };
 		CA4C605E049BE5EF68220B53 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42CE9DD8647ECBB940FCE688 /* AppModel.swift */; };
 		CC49C95B233AD3838F9ABD4D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3BFF0BB0E06D312DD6B515E8 /* Assets.xcassets */; };
 		D4DBD0F919D9D8CB3A92354B /* MobilewormApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E716B5AB2D89DB67665E918 /* MobilewormApp.swift */; };
@@ -27,6 +28,7 @@
 		3BFF0BB0E06D312DD6B515E8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		42CE9DD8647ECBB940FCE688 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		551B3098790B88827ED3D54B /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		690230D296E2F217324D0ECC /* WebMetadataCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebMetadataCache.swift; sourceTree = "<group>"; };
 		695729A4BE43908834C96F13 /* ServerValidationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerValidationService.swift; sourceTree = "<group>"; };
 		6D916B06156254B41175A3CE /* mobileworm.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = mobileworm.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		94926CF37F414D7B7D428488 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
@@ -70,6 +72,7 @@
 			children = (
 				DCA57464664F6CE62C53EF40 /* EarwormWebView.swift */,
 				F31A3186D561435410A00AA1 /* WebContainerView.swift */,
+				690230D296E2F217324D0ECC /* WebMetadataCache.swift */,
 			);
 			path = Web;
 			sourceTree = "<group>";
@@ -218,6 +221,7 @@
 				458FF766296E62BD5C7413DD /* SavedServerStore.swift in Sources */,
 				EB357829FB86542DA5CB25F0 /* ServerValidationService.swift in Sources */,
 				7EC3C9EE4D7447D9B1820ECD /* WebContainerView.swift in Sources */,
+				C9FF435ACFF765ACEAEE0E5D /* WebMetadataCache.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -294,7 +298,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = SX55QKAFL4;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = mobileworm;
+				INFOPLIST_KEY_CFBundleDisplayName = EarWorm;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -305,7 +309,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.sangfroyd.mobileworm;
-				PRODUCT_NAME = mobileworm;
+				PRODUCT_NAME = EarWorm;
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -375,7 +379,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = SX55QKAFL4;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = mobileworm;
+				INFOPLIST_KEY_CFBundleDisplayName = EarWorm;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -386,7 +390,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.sangfroyd.mobileworm;
-				PRODUCT_NAME = mobileworm;
+				PRODUCT_NAME = EarWorm;
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = 1;

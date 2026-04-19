@@ -16,7 +16,7 @@ struct ConnectServerView: View {
                     .font(.system(size: 44))
                     .foregroundStyle(.orange)
 
-                Text("mobileworm")
+                Text("EarWorm")
                     .font(.largeTitle.bold())
 
                 Text("Connect to your EarWorm server")

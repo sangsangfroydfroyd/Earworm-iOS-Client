@@ -2,15 +2,15 @@
 
 - App: mobileworm
 - From CLI: codex
-- Timestamp: 2026-04-18T19:49:46.920Z
+- Timestamp: 2026-04-19T00:01:26.153Z
 
 ## What Was Accomplished
 
-Fixed MobileWorm bottom safe-area behavior by disabling WKWebView UIScrollView automatic content inset adjustment and zeroing native scroll/content insets on create/update. Built with Xcode 26.4, security scan had no findings, installed/launched on iPhone 17 Pro simulator, and captured /tmp/mobileworm-safe-area.png showing the embedded Earworm bottom nav background reaches the physical bottom edge.
+Removed the brittle WKWebView artwork interception that blanked EarWorm images and replaced it with a native metadata cache bridge. MobileWorm now injects a bridge for cached EarWorm JSON payloads, persists those snapshots in the app cache directory, keeps native safe-area handling intact, and surfaces EarWorm branding in the iOS shell. Xcode 26.4 build passed, mobileworm security scan had no findings, and the simulator now renders the real EarWorm Home screen with artwork tiles again.
 
 ## Next Step
 
-Have the user relaunch the updated MobileWorm build on device/TestFlight; if the device still shows a gap, collect a fresh screenshot from that build and compare whether the native wrapper or the loaded Earworm web bundle is stale.
+Exercise one confirmed playback start against the host from the simulator or device and watch whether any metadata screen needs a shorter cache lifetime.
 
 ## Resume Instructions
 

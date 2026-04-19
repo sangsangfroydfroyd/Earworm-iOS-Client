@@ -12,13 +12,13 @@
     "stage": "",
     "status": ""
   },
-  "latest_change_summary": "Updated 11 files",
-  "latest_reason": "Captured file-changing work automatically.",
-  "latest_outcome": "Working tree changed and was recorded in app memory.",
+  "latest_change_summary": "Removed the brittle WKWebView artwork interception that blanked EarWorm images and replaced it with a native metadata cache bridge. MobileWorm now injects a bridge for cached EarWorm JSON payloads, persists those snapshots in the app cache directory, keeps native safe-area handling intact, and surfaces EarWorm branding in the iOS shell. Xcode 26.4 build passed, mobileworm security scan had no findings, and the simulator now renders the real EarWorm Home screen with artwork tiles again.",
+  "latest_reason": "Cross-CLI handoff — codex session ended.",
+  "latest_outcome": "Next step: Exercise one confirmed playback start against the host from the simulator or device and watch whether any metadata screen needs a shorter cache lifetime.",
   "blockers": [],
   "unresolved_issues": [],
   "resolved_items": [],
-  "next_recommended_step": "Have the user relaunch the updated MobileWorm build on device/TestFlight; if the device still shows a gap, collect a fresh screenshot from that build and compare whether the native wrapper or the loaded Earworm web bundle is stale.",
+  "next_recommended_step": "Exercise one confirmed playback start against the host from the simulator or device and watch whether any metadata screen needs a shorter cache lifetime.",
   "recent_files_touched": [
     ".app-freedom/memory/current.json",
     ".app-freedom/memory/current.md",
@@ -28,18 +28,18 @@
     ".app-freedom/memory/mempalace/status.json",
     ".handoff.md",
     ".ideas/open-questions.md",
+    "Mobileworm/Features/Connect/ConnectServerView.swift",
     "Mobileworm/Features/Web/EarwormWebView.swift",
-    ".app-freedom/memory/mempalace/events/2026-04-18T194932327Z-handoff-4149fa/2026-04-18T19-49-32-328Z-handoff-2026-04-18T194932327Z-handoff-4149fa.md",
-    ".app-freedom/memory/mempalace/events/2026-04-18T194932327Z-handoff-4149fa/mempalace.yaml",
-    "Mobileworm/App/RootView.swift",
-    "Mobileworm/Features/Web/WebContainerView.swift",
+    "Mobileworm/Services/ServerValidationService.swift",
     "mobileworm.xcodeproj/project.pbxproj",
     "project.yml",
-    ".app-freedom/memory/mempalace/events/2026-04-18T025742953Z-handoff-0fee93/2026-04-18T02-57-42-954Z-handoff-2026-04-18T025742953Z-handoff-0fee93.md",
-    ".app-freedom/memory/mempalace/events/2026-04-18T025742953Z-handoff-0fee93/mempalace.yaml",
-    ".ideas/decision-log.md",
-    ".state.json",
-    "Mobileworm/Features/Connect/ConnectServerView.swift"
+    ".app-freedom/memory/mempalace/events/2026-04-18T232746284Z-handoff-1e4615/2026-04-18T23-27-46-284Z-handoff-2026-04-18T232746284Z-handoff-1e4615.md",
+    ".app-freedom/memory/mempalace/events/2026-04-18T232746284Z-handoff-1e4615/mempalace.yaml",
+    "Mobileworm/Features/Web/WebMetadataCache.swift",
+    "Mobileworm/App/AppModel.swift",
+    "Mobileworm/Features/Web/WebArtworkCache.swift",
+    ".app-freedom/memory/mempalace/events/2026-04-18T194932327Z-handoff-4149fa/2026-04-18T19-49-32-328Z-handoff-2026-04-18T194932327Z-handoff-4149fa.md",
+    ".app-freedom/memory/mempalace/events/2026-04-18T194932327Z-handoff-4149fa/mempalace.yaml"
   ],
   "recent_decisions": [
     "Use a native EarWorm-styled login-screen Change Server overlay instead of injecting a DOM button, because the DOM button rendered in WKWebView but simulator taps did not fire its click handler reliably.",
@@ -60,6 +60,8 @@
   ],
   "failed_attempts": [],
   "future_self_notes": [
+    "Removed the brittle WKWebView artwork interception that blanked EarWorm images and replaced it with a native metadata cache bridge. MobileWorm now injects a bridge for cached EarWorm JSON payloads, persists those snapshots in the app cache directory, keeps native safe-area handling intact, and surfaces EarWorm branding in the iOS shell. Xcode 26.4 build passed, mobileworm security scan had no findings, and the simulator now renders the real EarWorm Home screen with artwork tiles again.",
+    "Added a launch-scoped native artwork cache for the iOS wrapper, wired WKWebView image requests through a custom earworm-cache URL scheme, clear the cache on every app bootstrap, and renamed the built iOS product/display name to EarWorm while keeping the repo/app id mobileworm. Rebuilt with Xcode 26.4, security check passed, installed/launched on the iPhone 17 Pro simulator, and confirmed the renamed bootstrap screen appears.",
     "Fixed MobileWorm bottom safe-area behavior by disabling WKWebView UIScrollView automatic content inset adjustment and zeroing native scroll/content insets on create/update. Built with Xcode 26.4, security scan had no findings, installed/launched on iPhone 17 Pro simulator, and captured /tmp/mobileworm-safe-area.png showing the embedded Earworm bottom nav background reaches the physical bottom edge.",
     "Tightened fullscreen fit after bottom safe-area remained visible. Web destination now ignores safe areas at the RootView route level, RootView hides navigation toolbar and paints a safe fallback background, and WebContainerView uses overlay instead of safeAreaInset for unauthenticated Change Server so the WKWebView is no longer resized by native bottom insets. Simulator build/run and screenshot sanity check passed; security scan had no findings.",
     "Fixed remaining bottom safe-area bar by moving ignoresSafeArea(.container) onto the WKWebView itself, making the web content edge-to-edge on all sides while keeping native unauthenticated Change Server control in SwiftUI safe-area placement. iOS simulator build passed; mobileworm security scan had no findings.",
@@ -77,17 +79,15 @@
     "Once full Xcode is available, the first follow-up should be xcodegen generate, xcodebuild -list, and a simulator build to catch any SwiftUI or project-setting issues.",
     "Completed /plan for mobileworm. Defined the app as an iPhone-first SwiftUI shell with WKWebView reuse of EarWorm's existing mobile UI, lightweight saved-server persistence, HTTPS-only validation, and a staged plan for foundation, validation hardening, recovery flows, and TestFlight QA.",
     "Do not weaken ATS or add broad insecure-network exceptions unless a real blocker appears during implementation.",
-    "Treat any attempt to recreate EarWorm screens natively as scope drift unless the web shell proves insufficient.",
-    "Completed /dream for mobileworm. Defined the app as an iPhone-first personal-TestFlight wrapper around EarWorm's existing mobile web UI, with first-launch HTTPS server entry, saved-server behavior, change-server recovery, and a WKWebView-based login/app flow.",
-    "Prefer validating against an explicit EarWorm-specific public endpoint during implementation instead of relying only on loose page-title or HTML checks."
+    "Treat any attempt to recreate EarWorm screens natively as scope drift unless the web shell proves insufficient."
   ],
   "last_checkpoint_at": "2026-04-18T01:47:18.364Z",
   "last_session_end_at": "",
-  "last_event_id": "2026-04-18T195748145Z-change-16db6a",
-  "last_event_at": "2026-04-18T19:57:48.145Z",
+  "last_event_id": "2026-04-19T000105608Z-handoff-fda75c",
+  "last_event_at": "2026-04-19T00:01:05.608Z",
   "last_recorded_fingerprint": {
     "kind": "git-status",
-    "value": "6da06d6de96781ca5b314b782ea6305052253f055dad14752eb8fa13f3454320",
+    "value": "99dc11136aef3991e61a909c87e216e16a1e2a1eceb3f849b7d2683d2070edc2",
     "dirty": true,
     "changed_files": [
       ".app-freedom/memory/current.json",
@@ -98,11 +98,18 @@
       ".app-freedom/memory/mempalace/status.json",
       ".handoff.md",
       ".ideas/open-questions.md",
+      "Mobileworm/Features/Connect/ConnectServerView.swift",
       "Mobileworm/Features/Web/EarwormWebView.swift",
-      ".app-freedom/memory/mempalace/events/2026-04-18T194932327Z-handoff-4149fa/2026-04-18T19-49-32-328Z-handoff-2026-04-18T194932327Z-handoff-4149fa.md",
-      ".app-freedom/memory/mempalace/events/2026-04-18T194932327Z-handoff-4149fa/mempalace.yaml"
+      "Mobileworm/Services/ServerValidationService.swift",
+      "mobileworm.xcodeproj/project.pbxproj",
+      "project.yml",
+      ".app-freedom/memory/mempalace/events/2026-04-18T232746284Z-handoff-1e4615/2026-04-18T23-27-46-284Z-handoff-2026-04-18T232746284Z-handoff-1e4615.md",
+      ".app-freedom/memory/mempalace/events/2026-04-18T232746284Z-handoff-1e4615/mempalace.yaml",
+      ".app-freedom/memory/mempalace/events/2026-04-19T000105608Z-handoff-fda75c/2026-04-19T00-01-05-608Z-handoff-2026-04-19T000105608Z-handoff-fda75c.md",
+      ".app-freedom/memory/mempalace/events/2026-04-19T000105608Z-handoff-fda75c/mempalace.yaml",
+      "Mobileworm/Features/Web/WebMetadataCache.swift"
     ],
-    "captured_at": "2026-04-18T19:57:48.145Z"
+    "captured_at": "2026-04-19T00:01:26.059Z"
   },
   "warning": {
     "unlogged_changes": false,
@@ -115,11 +122,18 @@
       ".app-freedom/memory/mempalace/status.json",
       ".handoff.md",
       ".ideas/open-questions.md",
+      "Mobileworm/Features/Connect/ConnectServerView.swift",
       "Mobileworm/Features/Web/EarwormWebView.swift",
-      ".app-freedom/memory/mempalace/events/2026-04-18T194932327Z-handoff-4149fa/2026-04-18T19-49-32-328Z-handoff-2026-04-18T194932327Z-handoff-4149fa.md",
-      ".app-freedom/memory/mempalace/events/2026-04-18T194932327Z-handoff-4149fa/mempalace.yaml"
+      "Mobileworm/Services/ServerValidationService.swift",
+      "mobileworm.xcodeproj/project.pbxproj",
+      "project.yml",
+      ".app-freedom/memory/mempalace/events/2026-04-18T232746284Z-handoff-1e4615/2026-04-18T23-27-46-284Z-handoff-2026-04-18T232746284Z-handoff-1e4615.md",
+      ".app-freedom/memory/mempalace/events/2026-04-18T232746284Z-handoff-1e4615/mempalace.yaml",
+      ".app-freedom/memory/mempalace/events/2026-04-19T000105608Z-handoff-fda75c/2026-04-19T00-01-05-608Z-handoff-2026-04-19T000105608Z-handoff-fda75c.md",
+      ".app-freedom/memory/mempalace/events/2026-04-19T000105608Z-handoff-fda75c/mempalace.yaml",
+      "Mobileworm/Features/Web/WebMetadataCache.swift"
     ],
     "message": ""
   },
-  "updated_at": "2026-04-18T19:57:48.507Z"
+  "updated_at": "2026-04-19T00:01:25.911Z"
 }

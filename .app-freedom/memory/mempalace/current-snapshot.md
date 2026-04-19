@@ -1,6 +1,6 @@
 # App Freedom Compatibility Snapshot: mobileworm
 
-Generated: 2026-04-18T19:57:48.796Z
+Generated: 2026-04-19T00:01:26.141Z
 Configured backend: mempalace
 Active backend: mempalace
 
@@ -16,6 +16,6 @@ Not recorded.
 
 ## Latest Change
 
-Updated 11 files
+Removed the brittle WKWebView artwork interception that blanked EarWorm images and replaced it with a native metadata cache bridge. MobileWorm now injects a bridge for cached EarWorm JSON payloads, persists those snapshots in the app cache directory, keeps native safe-area handling intact, and surfaces EarWorm branding in the iOS shell. Xcode 26.4 build passed, mobileworm security scan had no findings, and the simulator now renders the real EarWorm Home screen with artwork tiles again.
 
-Next step: Have the user relaunch the updated MobileWorm build on device/TestFlight; if the device still shows a gap, collect a fresh screenshot from that build and compare whether the native wrapper or the loaded Earworm web bundle is stale.
+Next step: Exercise one confirmed playback start against the host from the simulator or device and watch whether any metadata screen needs a shorter cache lifetime.

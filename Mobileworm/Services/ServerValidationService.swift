@@ -13,7 +13,7 @@ struct ServerValidationService {
         } catch let error as URLError {
             throw mapNetworkError(error)
         } catch {
-            throw ValidationError.networkFailure("mobileworm could not reach that server.")
+            throw ValidationError.networkFailure("EarWorm could not reach that server.")
         }
 
         guard let httpResponse = response as? HTTPURLResponse else {
@@ -136,7 +136,7 @@ enum ValidationError: LocalizedError {
         case .invalidURL:
             return "Enter a valid EarWorm server URL."
         case .insecureURL:
-            return "mobileworm only supports HTTPS EarWorm servers in v1."
+            return "EarWorm for iOS only supports HTTPS EarWorm servers in v1."
         case .invalidResponse:
             return "The server returned an unexpected response."
         case .networkFailure(let message):
@@ -144,7 +144,7 @@ enum ValidationError: LocalizedError {
         case .notEarWorm:
             return "This server is reachable, but it does not appear to be EarWorm."
         case .tlsFailure:
-            return "mobileworm could not establish a trusted HTTPS connection to that server."
+            return "EarWorm could not establish a trusted HTTPS connection to that server."
         }
     }
 }

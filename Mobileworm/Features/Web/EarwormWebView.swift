@@ -20,9 +20,12 @@ struct EarwormWebView: UIViewRepresentable {
         configuration.defaultWebpagePreferences.allowsContentJavaScript = true
         configuration.userContentController.addUserScript(Self.viewportLockScript)
         configuration.userContentController.addUserScript(Self.bridgeScript)
+        configuration.userContentController.addUserScript(Self.metadataCacheBridgeScript)
         configuration.userContentController.add(context.coordinator, name: Coordinator.authStateHandler)
+        configuration.userContentController.add(context.coordinator, name: Coordinator.metadataCacheHandler)
 
         let webView = WKWebView(frame: .zero, configuration: configuration)
+        context.coordinator.webView = webView
         webView.navigationDelegate = context.coordinator
         webView.allowsBackForwardNavigationGestures = true
         Self.disableNativeInsets(for: webView)
@@ -40,7 +43,9 @@ struct EarwormWebView: UIViewRepresentable {
 
     static func dismantleUIView(_ webView: WKWebView, coordinator: Coordinator) {
         webView.configuration.userContentController.removeScriptMessageHandler(forName: Coordinator.authStateHandler)
+        webView.configuration.userContentController.removeScriptMessageHandler(forName: Coordinator.metadataCacheHandler)
         webView.scrollView.delegate = nil
+        coordinator.webView = nil
     }
 
     private static func lockZoom(for webView: WKWebView) {
@@ -90,6 +95,71 @@ struct EarwormWebView: UIViewRepresentable {
           ["gesturestart", "gesturechange", "gestureend"].forEach((eventName) => {
             document.addEventListener(eventName, (event) => event.preventDefault(), { passive: false });
           });
+        })();
+        """,
+        injectionTime: .atDocumentStart,
+        forMainFrameOnly: true
+    )
+
+    private static let metadataCacheBridgeScript = WKUserScript(
+        source: """
+        (() => {
+          const metadataCacheHandler = window.webkit?.messageHandlers?.mobilewormMetadataCache;
+          if (!metadataCacheHandler) {
+            return;
+          }
+
+          if (window.__mobilewormMetadataCacheBridgeInstalled) {
+            return;
+          }
+
+          window.__mobilewormMetadataCacheBridgeInstalled = true;
+          let nextRequestId = 0;
+          const pending = new Map();
+
+          const settle = (payload) => {
+            const requestId = payload?.id;
+            if (!requestId || !pending.has(requestId)) {
+              return;
+            }
+
+            const { resolve, reject } = pending.get(requestId);
+            pending.delete(requestId);
+
+            if (payload.ok) {
+              resolve(payload.body ?? null);
+            } else {
+              reject(new Error(payload.error || "Metadata cache bridge failed"));
+            }
+          };
+
+          window.__mobilewormMetadataCacheBridgeResolve = settle;
+
+          window.__mobilewormMetadataCache = {
+            get(cacheKey) {
+              return new Promise((resolve, reject) => {
+                const id = `metadata-${++nextRequestId}`;
+                pending.set(id, { resolve, reject });
+                metadataCacheHandler.postMessage({
+                  action: "get",
+                  id,
+                  cacheKey
+                });
+              });
+            },
+            put(cacheKey, body) {
+              return new Promise((resolve, reject) => {
+                const id = `metadata-${++nextRequestId}`;
+                pending.set(id, { resolve, reject });
+                metadataCacheHandler.postMessage({
+                  action: "put",
+                  id,
+                  cacheKey,
+                  body
+                });
+              });
+            }
+          };
         })();
         """,
         injectionTime: .atDocumentStart,
@@ -159,9 +229,11 @@ struct EarwormWebView: UIViewRepresentable {
 
     final class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler, UIScrollViewDelegate {
         static let authStateHandler = "mobilewormAuthState"
+        static let metadataCacheHandler = "mobilewormMetadataCache"
 
         private let onAuthenticationStateChanged: (Bool) -> Void
         private let onLoadFailure: (String) -> Void
+        weak var webView: WKWebView?
 
         init(
             onAuthenticationStateChanged: @escaping (Bool) -> Void,
@@ -201,6 +273,55 @@ struct EarwormWebView: UIViewRepresentable {
                     return
                 }
                 onAuthenticationStateChanged(authenticated)
+            case Self.metadataCacheHandler:
+                guard
+                    let body = message.body as? [String: Any],
+                    let action = body["action"] as? String,
+                    let requestId = body["id"] as? String,
+                    let cacheKey = body["cacheKey"] as? String
+                else {
+                    return
+                }
+
+                Task {
+                    do {
+                        switch action {
+                        case "get":
+                            let cachedBody = await WebMetadataCache.shared.cachedBody(for: cacheKey)
+                            await sendMetadataCacheResponse(
+                                requestId: requestId,
+                                ok: true,
+                                body: cachedBody,
+                                errorMessage: nil
+                            )
+                        case "put":
+                            guard let body = body["body"] as? String else {
+                                await sendMetadataCacheResponse(
+                                    requestId: requestId,
+                                    ok: false,
+                                    body: nil,
+                                    errorMessage: "Metadata cache body was missing."
+                                )
+                                return
+                            }
+
+                            await WebMetadataCache.shared.store(body: body, for: cacheKey)
+                            await sendMetadataCacheResponse(
+                                requestId: requestId,
+                                ok: true,
+                                body: nil,
+                                errorMessage: nil
+                            )
+                        default:
+                            await sendMetadataCacheResponse(
+                                requestId: requestId,
+                                ok: false,
+                                body: nil,
+                                errorMessage: "Unknown metadata cache action."
+                            )
+                        }
+                    }
+                }
             default:
                 break
             }
@@ -212,6 +333,31 @@ struct EarwormWebView: UIViewRepresentable {
             }
 
             onLoadFailure(error.localizedDescription)
+        }
+
+        @MainActor
+        private func sendMetadataCacheResponse(
+            requestId: String,
+            ok: Bool,
+            body: String?,
+            errorMessage: String?
+        ) {
+            let payload: [String: Any] = [
+                "id": requestId,
+                "ok": ok,
+                "body": body ?? NSNull(),
+                "error": errorMessage ?? NSNull(),
+            ]
+
+            guard
+                let webView,
+                let payloadData = try? JSONSerialization.data(withJSONObject: payload),
+                let payloadString = String(data: payloadData, encoding: .utf8)
+            else {
+                return
+            }
+
+            webView.evaluateJavaScript("window.__mobilewormMetadataCacheBridgeResolve?.(\(payloadString))")
         }
     }
 }

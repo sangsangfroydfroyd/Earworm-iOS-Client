@@ -1,9 +1,9 @@
 {
-  "last_attempt_at": "2026-04-18T19:57:48.255Z",
-  "last_success_at": "2026-04-18T19:49:46.467Z",
+  "last_attempt_at": "2026-04-19T00:01:25.653Z",
+  "last_success_at": "2026-04-19T00:01:25.653Z",
   "last_error": "",
-  "last_note": "MemPalace sync skipped for trigger \"change\" by preference.",
-  "last_trigger": "change",
-  "last_export_path": "/Volumes/T7/projects/mobileworm/.app-freedom/memory/mempalace/events/2026-04-18T194932327Z-handoff-4149fa/2026-04-18T19-49-32-328Z-handoff-2026-04-18T194932327Z-handoff-4149fa.md",
-  "last_sync_command": "bash /Volumes/T7/claudebuilder/scripts/mempalace.sh mine /Volumes/T7/projects/mobileworm/.app-freedom/memory/mempalace/events/2026-04-18T194932327Z-handoff-4149fa --mode projects --wing mobileworm --agent app-freedom"
+  "last_note": "",
+  "last_trigger": "handoff",
+  "last_export_path": "/Volumes/T7/projects/mobileworm/.app-freedom/memory/mempalace/events/2026-04-19T000105608Z-handoff-fda75c/2026-04-19T00-01-05-608Z-handoff-2026-04-19T000105608Z-handoff-fda75c.md",
+  "last_sync_command": "bash /Volumes/T7/claudebuilder/scripts/mempalace.sh mine /Volumes/T7/projects/mobileworm/.app-freedom/memory/mempalace/events/2026-04-19T000105608Z-handoff-fda75c --mode projects --wing mobileworm --agent app-freedom"
 }

@@ -14,10 +14,10 @@ Not recorded.
 
 ## Recent Changes
 
-Updated 11 files
+Removed the brittle WKWebView artwork interception that blanked EarWorm images and replaced it with a native metadata cache bridge. MobileWorm now injects a bridge for cached EarWorm JSON payloads, persists those snapshots in the app cache directory, keeps native safe-area handling intact, and surfaces EarWorm branding in the iOS shell. Xcode 26.4 build passed, mobileworm security scan had no findings, and the simulator now renders the real EarWorm Home screen with artwork tiles again.
 
-Reason: Captured file-changing work automatically.
-Outcome: Working tree changed and was recorded in app memory.
+Reason: Cross-CLI handoff — codex session ended.
+Outcome: Next step: Exercise one confirmed playback start against the host from the simulator or device and watch whether any metadata screen needs a shorter cache lifetime.
 - .app-freedom/memory/current.json
 - .app-freedom/memory/current.md
 - .app-freedom/memory/handoff-latest.md
@@ -26,18 +26,18 @@ Outcome: Working tree changed and was recorded in app memory.
 - .app-freedom/memory/mempalace/status.json
 - .handoff.md
 - .ideas/open-questions.md
+- Mobileworm/Features/Connect/ConnectServerView.swift
 - Mobileworm/Features/Web/EarwormWebView.swift
-- .app-freedom/memory/mempalace/events/2026-04-18T194932327Z-handoff-4149fa/2026-04-18T19-49-32-328Z-handoff-2026-04-18T194932327Z-handoff-4149fa.md
-- .app-freedom/memory/mempalace/events/2026-04-18T194932327Z-handoff-4149fa/mempalace.yaml
-- Mobileworm/App/RootView.swift
-- Mobileworm/Features/Web/WebContainerView.swift
+- Mobileworm/Services/ServerValidationService.swift
 - mobileworm.xcodeproj/project.pbxproj
 - project.yml
-- .app-freedom/memory/mempalace/events/2026-04-18T025742953Z-handoff-0fee93/2026-04-18T02-57-42-954Z-handoff-2026-04-18T025742953Z-handoff-0fee93.md
-- .app-freedom/memory/mempalace/events/2026-04-18T025742953Z-handoff-0fee93/mempalace.yaml
-- .ideas/decision-log.md
-- .state.json
-- Mobileworm/Features/Connect/ConnectServerView.swift
+- .app-freedom/memory/mempalace/events/2026-04-18T232746284Z-handoff-1e4615/2026-04-18T23-27-46-284Z-handoff-2026-04-18T232746284Z-handoff-1e4615.md
+- .app-freedom/memory/mempalace/events/2026-04-18T232746284Z-handoff-1e4615/mempalace.yaml
+- Mobileworm/Features/Web/WebMetadataCache.swift
+- Mobileworm/App/AppModel.swift
+- Mobileworm/Features/Web/WebArtworkCache.swift
+- .app-freedom/memory/mempalace/events/2026-04-18T194932327Z-handoff-4149fa/2026-04-18T19-49-32-328Z-handoff-2026-04-18T194932327Z-handoff-4149fa.md
+- .app-freedom/memory/mempalace/events/2026-04-18T194932327Z-handoff-4149fa/mempalace.yaml
 
 ## Decisions
 
@@ -63,6 +63,8 @@ Outcome: Working tree changed and was recorded in app memory.
 
 ## Failed Attempts / Future-Self Notes
 
+- Removed the brittle WKWebView artwork interception that blanked EarWorm images and replaced it with a native metadata cache bridge. MobileWorm now injects a bridge for cached EarWorm JSON payloads, persists those snapshots in the app cache directory, keeps native safe-area handling intact, and surfaces EarWorm branding in the iOS shell. Xcode 26.4 build passed, mobileworm security scan had no findings, and the simulator now renders the real EarWorm Home screen with artwork tiles again.
+- Added a launch-scoped native artwork cache for the iOS wrapper, wired WKWebView image requests through a custom earworm-cache URL scheme, clear the cache on every app bootstrap, and renamed the built iOS product/display name to EarWorm while keeping the repo/app id mobileworm. Rebuilt with Xcode 26.4, security check passed, installed/launched on the iPhone 17 Pro simulator, and confirmed the renamed bootstrap screen appears.
 - Fixed MobileWorm bottom safe-area behavior by disabling WKWebView UIScrollView automatic content inset adjustment and zeroing native scroll/content insets on create/update. Built with Xcode 26.4, security scan had no findings, installed/launched on iPhone 17 Pro simulator, and captured /tmp/mobileworm-safe-area.png showing the embedded Earworm bottom nav background reaches the physical bottom edge.
 - Tightened fullscreen fit after bottom safe-area remained visible. Web destination now ignores safe areas at the RootView route level, RootView hides navigation toolbar and paints a safe fallback background, and WebContainerView uses overlay instead of safeAreaInset for unauthenticated Change Server so the WKWebView is no longer resized by native bottom insets. Simulator build/run and screenshot sanity check passed; security scan had no findings.
 - Fixed remaining bottom safe-area bar by moving ignoresSafeArea(.container) onto the WKWebView itself, making the web content edge-to-edge on all sides while keeping native unauthenticated Change Server control in SwiftUI safe-area placement. iOS simulator build passed; mobileworm security scan had no findings.
@@ -81,12 +83,10 @@ Outcome: Working tree changed and was recorded in app memory.
 - Completed /plan for mobileworm. Defined the app as an iPhone-first SwiftUI shell with WKWebView reuse of EarWorm's existing mobile UI, lightweight saved-server persistence, HTTPS-only validation, and a staged plan for foundation, validation hardening, recovery flows, and TestFlight QA.
 - Do not weaken ATS or add broad insecure-network exceptions unless a real blocker appears during implementation.
 - Treat any attempt to recreate EarWorm screens natively as scope drift unless the web shell proves insufficient.
-- Completed /dream for mobileworm. Defined the app as an iPhone-first personal-TestFlight wrapper around EarWorm's existing mobile web UI, with first-launch HTTPS server entry, saved-server behavior, change-server recovery, and a WKWebView-based login/app flow.
-- Prefer validating against an explicit EarWorm-specific public endpoint during implementation instead of relying only on loose page-title or HTML checks.
 
 ## Next Step
 
-Have the user relaunch the updated MobileWorm build on device/TestFlight; if the device still shows a gap, collect a fresh screenshot from that build and compare whether the native wrapper or the loaded Earworm web bundle is stale.
+Exercise one confirmed playback start against the host from the simulator or device and watch whether any metadata screen needs a shorter cache lifetime.
 
 ## Warning
 
