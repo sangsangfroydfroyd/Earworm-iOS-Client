@@ -7,6 +7,8 @@ struct EarwormWebView: UIViewRepresentable {
     let onAuthenticationStateChanged: (Bool) -> Void
     let onLoadFailure: (String) -> Void
 
+    private static let debugSessionCookieName = "earworm_session"
+
     func makeCoordinator() -> Coordinator {
         Coordinator(
             onAuthenticationStateChanged: onAuthenticationStateChanged,
@@ -43,14 +45,14 @@ struct EarwormWebView: UIViewRepresentable {
         Self.disableNativeInsets(for: webView)
         webView.scrollView.delegate = context.coordinator
         Self.lockZoom(for: webView)
+        context.coordinator.prepareInitialLoad(for: url, in: webView)
         return webView
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
         Self.disableNativeInsets(for: webView)
         Self.lockZoom(for: webView)
-        guard webView.url?.absoluteString != url.absoluteString else { return }
-        webView.load(URLRequest(url: url))
+        context.coordinator.prepareInitialLoad(for: url, in: webView)
     }
 
     static func dismantleUIView(_ webView: WKWebView, coordinator: Coordinator) {
@@ -370,6 +372,10 @@ struct EarwormWebView: UIViewRepresentable {
 
         private let onAuthenticationStateChanged: (Bool) -> Void
         private let onLoadFailure: (String) -> Void
+        private var pendingURL: URL?
+        private var loadingURL: String?
+        private var debugCookieSeededHost: String?
+        private var debugCookieSeedingInFlight = false
         weak var webView: WKWebView?
 
         init(
@@ -380,16 +386,81 @@ struct EarwormWebView: UIViewRepresentable {
             self.onLoadFailure = onLoadFailure
         }
 
+        func prepareInitialLoad(for url: URL, in webView: WKWebView) {
+            guard loadingURL != url.absoluteString, webView.url?.absoluteString != url.absoluteString else {
+                return
+            }
+
+            pendingURL = url
+            seedDebugSessionCookieIfNeeded(for: url, in: webView)
+        }
+
+        private func seedDebugSessionCookieIfNeeded(for url: URL, in webView: WKWebView) {
+            guard
+                let host = url.host,
+                let token = ProcessInfo.processInfo.environment["EARWORM_SESSION_TOKEN"],
+                !token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                debugCookieSeededHost != host
+            else {
+                loadPendingURLIfReady(in: webView)
+                return
+            }
+
+            guard !debugCookieSeedingInFlight else {
+                return
+            }
+
+            debugCookieSeedingInFlight = true
+            let properties: [HTTPCookiePropertyKey: Any] = [
+                .domain: host,
+                .path: "/api",
+                .name: EarwormWebView.debugSessionCookieName,
+                .value: token,
+                .secure: (url.scheme?.lowercased() == "https"),
+                .expires: Date(timeIntervalSinceNow: 60 * 60 * 24 * 30),
+            ]
+
+            guard let cookie = HTTPCookie(properties: properties) else {
+                debugCookieSeedingInFlight = false
+                loadPendingURLIfReady(in: webView)
+                return
+            }
+
+            webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie) { [weak self, weak webView] in
+                guard let self, let webView else {
+                    return
+                }
+
+                self.debugCookieSeededHost = host
+                self.debugCookieSeedingInFlight = false
+                self.loadPendingURLIfReady(in: webView)
+            }
+        }
+
+        private func loadPendingURLIfReady(in webView: WKWebView) {
+            guard !debugCookieSeedingInFlight, let pendingURL else {
+                return
+            }
+
+            loadingURL = pendingURL.absoluteString
+            self.pendingURL = nil
+            webView.load(URLRequest(url: pendingURL))
+        }
+
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            loadingURL = nil
             handleLoadFailure(error)
         }
 
         func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+            loadingURL = nil
             handleLoadFailure(error)
         }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            loadingURL = webView.url?.absoluteString
             webView.evaluateJavaScript("window.__mobilewormBridgeSync?.()")
+            syncDebugBrowserSessionIfNeeded(in: webView)
         }
 
         func viewForZooming(in scrollView: UIScrollView) -> UIView? {
@@ -761,6 +832,57 @@ struct EarwormWebView: UIViewRepresentable {
             }
 
             onLoadFailure(error.localizedDescription)
+        }
+
+        private func syncDebugBrowserSessionIfNeeded(in webView: WKWebView) {
+            guard
+                ProcessInfo.processInfo.environment["EARWORM_SESSION_TOKEN"]?
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                    .isEmpty == false
+            else {
+                return
+            }
+
+            let script = """
+            (() => {
+              const userKey = "earworm_user";
+              const authSourceKey = "earworm_auth_source";
+              const authProviderKey = "earworm_auth_provider";
+
+              if (window.localStorage?.getItem(userKey)) {
+                window.__mobilewormBridgeSync?.();
+                return;
+              }
+
+              fetch("/api/auth/me", { credentials: "same-origin" })
+                .then((response) => {
+                  if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                  }
+                  return response.json();
+                })
+                .then((payload) => {
+                  if (!payload?.user || !payload?.session?.source) {
+                    return;
+                  }
+
+                  window.localStorage.setItem(userKey, JSON.stringify(payload.user));
+                  window.localStorage.setItem(authSourceKey, payload.session.source);
+
+                  if (payload.session.provider) {
+                    window.localStorage.setItem(authProviderKey, payload.session.provider);
+                  } else {
+                    window.localStorage.removeItem(authProviderKey);
+                  }
+
+                  window.dispatchEvent(new StorageEvent("storage", { key: userKey }));
+                  window.__mobilewormBridgeSync?.();
+                })
+                .catch(() => undefined);
+            })();
+            """
+
+            webView.evaluateJavaScript(script)
         }
 
         @MainActor

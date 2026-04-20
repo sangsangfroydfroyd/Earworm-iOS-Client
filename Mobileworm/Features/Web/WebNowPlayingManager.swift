@@ -42,6 +42,18 @@ struct WebNowPlayingPayload {
 final class WebNowPlayingManager {
     static let shared = WebNowPlayingManager()
 
+    private static let artworkURLSession: URLSession = {
+        let cache = URLCache(
+            memoryCapacity: 20 * 1024 * 1024,
+            diskCapacity: 100 * 1024 * 1024,
+            diskPath: "EarwormArtworkCache"
+        )
+        let config = URLSessionConfiguration.default
+        config.urlCache = cache
+        config.requestCachePolicy = .useProtocolCachePolicy
+        return URLSession(configuration: config)
+    }()
+
     private var artworkCache: [String: MPMediaItemArtwork] = [:]
     private var artworkTask: Task<Void, Never>?
     private var currentArtworkURLString: String?
@@ -204,7 +216,7 @@ final class WebNowPlayingManager {
             request.setValue(cookieHeader, forHTTPHeaderField: "Cookie")
         }
 
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await Self.artworkURLSession.data(for: request)
         guard
             let httpResponse = response as? HTTPURLResponse,
             (200..<300).contains(httpResponse.statusCode)

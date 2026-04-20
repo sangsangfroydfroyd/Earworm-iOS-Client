@@ -12,8 +12,8 @@
     "stage": "",
     "status": ""
   },
-  "latest_change_summary": "Updated 8 files",
-  "latest_reason": "Captured after Bash | command: cd /Volumes/T7/projects/earworm/src-tauri && for i in 1 2 3 4 5 6 7 8 9 10 11 12; do find /Volumes/T7/projects/.cache...",
+  "latest_change_summary": "Updated 7 files",
+  "latest_reason": "Captured after Bash | command: grep -c \"^}\" /Volumes/T7/projects/earworm/src-tauri/src/services/recommendation_engine.rs | head -1 wc -l /Volumes/T7...",
   "latest_outcome": "Working tree changed and was recorded in app memory.",
   "blockers": [
     "Dynamic Island artwork and Files app browse behavior still need physical device or full simulator interaction with a live server to verify end to end."
@@ -28,8 +28,8 @@
     ".app-freedom/memory/mempalace/current-snapshot.md",
     ".app-freedom/memory/mempalace/status.json",
     "Mobileworm/Features/Web/EarwormWebView.swift",
-    "Mobileworm/Features/Web/WebDownloadManager.swift",
     "Mobileworm/Features/Web/WebNowPlayingManager.swift",
+    "Mobileworm/Features/Web/WebDownloadManager.swift",
     "mobileworm.xcodeproj/project.pbxproj",
     "project.yml",
     "Mobileworm/Info.plist",
@@ -85,11 +85,11 @@
   ],
   "last_checkpoint_at": "2026-04-18T01:47:18.364Z",
   "last_session_end_at": "",
-  "last_event_id": "2026-04-19T065105636Z-change-254962",
-  "last_event_at": "2026-04-19T06:51:05.636Z",
+  "last_event_id": "2026-04-19T231344342Z-change-eae75a",
+  "last_event_at": "2026-04-19T23:13:44.342Z",
   "last_recorded_fingerprint": {
     "kind": "git-status",
-    "value": "15b38333b9de43402ffb3029959be007d7bfed7993354063c4133a0d9892da17",
+    "value": "5578789c3c49a57d46051e940cdded4097958330004759b5e26bd4386c24d299",
     "dirty": true,
     "changed_files": [
       ".app-freedom/memory/current.json",
@@ -98,10 +98,9 @@
       ".app-freedom/memory/mempalace/current-snapshot.md",
       ".app-freedom/memory/mempalace/status.json",
       "Mobileworm/Features/Web/EarwormWebView.swift",
-      "Mobileworm/Features/Web/WebDownloadManager.swift",
       "Mobileworm/Features/Web/WebNowPlayingManager.swift"
     ],
-    "captured_at": "2026-04-19T06:51:05.636Z"
+    "captured_at": "2026-04-19T23:13:44.342Z"
   },
   "warning": {
     "unlogged_changes": false,
@@ -112,10 +111,9 @@
       ".app-freedom/memory/mempalace/current-snapshot.md",
       ".app-freedom/memory/mempalace/status.json",
       "Mobileworm/Features/Web/EarwormWebView.swift",
-      "Mobileworm/Features/Web/WebDownloadManager.swift",
       "Mobileworm/Features/Web/WebNowPlayingManager.swift"
     ],
     "message": ""
   },
-  "updated_at": "2026-04-19T06:51:05.841Z"
+  "updated_at": "2026-04-19T23:13:44.530Z"
 }
