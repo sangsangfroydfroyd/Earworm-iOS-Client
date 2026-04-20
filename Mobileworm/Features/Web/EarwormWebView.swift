@@ -8,6 +8,7 @@ struct EarwormWebView: UIViewRepresentable {
     let onLoadFailure: (String) -> Void
 
     private static let debugSessionCookieName = "earworm_session"
+    private static let diagnostics = AppDiagnosticsStore.shared
 
     func makeCoordinator() -> Coordinator {
         Coordinator(
@@ -32,10 +33,12 @@ struct EarwormWebView: UIViewRepresentable {
         configuration.userContentController.addUserScript(Self.metadataCacheBridgeScript)
         configuration.userContentController.addUserScript(Self.downloadBridgeScript)
         configuration.userContentController.addUserScript(Self.nowPlayingBridgeScript)
+        configuration.userContentController.addUserScript(Self.diagnosticsBridgeScript)
         configuration.userContentController.add(context.coordinator, name: Coordinator.authStateHandler)
         configuration.userContentController.add(context.coordinator, name: Coordinator.metadataCacheHandler)
         configuration.userContentController.add(context.coordinator, name: Coordinator.downloadHandler)
         configuration.userContentController.add(context.coordinator, name: Coordinator.nowPlayingHandler)
+        configuration.userContentController.add(context.coordinator, name: Coordinator.diagnosticsHandler)
 
         let webView = WKWebView(frame: .zero, configuration: configuration)
         context.coordinator.webView = webView
@@ -60,6 +63,7 @@ struct EarwormWebView: UIViewRepresentable {
         webView.configuration.userContentController.removeScriptMessageHandler(forName: Coordinator.metadataCacheHandler)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: Coordinator.downloadHandler)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: Coordinator.nowPlayingHandler)
+        webView.configuration.userContentController.removeScriptMessageHandler(forName: Coordinator.diagnosticsHandler)
         WebNowPlayingManager.shared.detach(webView: webView)
         webView.scrollView.delegate = nil
         coordinator.webView = nil
@@ -364,11 +368,151 @@ struct EarwormWebView: UIViewRepresentable {
         forMainFrameOnly: true
     )
 
+    private static let diagnosticsBridgeScript = WKUserScript(
+        source: """
+        (() => {
+          const diagnosticsHandler = window.webkit?.messageHandlers?.mobilewormDiagnostics;
+          if (!diagnosticsHandler || window.__mobilewormDiagnosticsInstalled) {
+            return;
+          }
+
+          window.__mobilewormDiagnosticsInstalled = true;
+
+          const stringify = (value) => {
+            if (typeof value === "string") {
+              return value;
+            }
+            if (value instanceof Error) {
+              return `${value.name}: ${value.message}`;
+            }
+            try {
+              return JSON.stringify(value);
+            } catch {
+              return String(value);
+            }
+          };
+
+          const send = (event, payload = {}) => {
+            try {
+              diagnosticsHandler.postMessage({
+                event,
+                href: window.location.href,
+                path: window.location.pathname,
+                title: document.title,
+                ...payload
+              });
+            } catch {
+              // Diagnostics are best-effort only.
+            }
+          };
+
+          const originalWarn = console.warn;
+          console.warn = (...args) => {
+            send("console_warn", { message: args.map(stringify).join(" ") });
+            return originalWarn.apply(console, args);
+          };
+
+          const originalError = console.error;
+          console.error = (...args) => {
+            send("console_error", { message: args.map(stringify).join(" ") });
+            return originalError.apply(console, args);
+          };
+
+          window.addEventListener("error", (event) => {
+            send("window_error", {
+              message: event.message || "Unknown window error",
+              source: event.filename || "",
+              line: String(event.lineno || 0),
+              column: String(event.colno || 0)
+            });
+          });
+
+          window.addEventListener("unhandledrejection", (event) => {
+            send("unhandled_rejection", {
+              message: stringify(event.reason)
+            });
+          });
+
+          const describeAudio = (audio) => ({
+            currentSrc: audio.currentSrc || audio.src || "",
+            paused: String(audio.paused),
+            currentTime: String(audio.currentTime || 0),
+            readyState: String(audio.readyState),
+            networkState: String(audio.networkState),
+            error: audio.error ? `${audio.error.code}` : ""
+          });
+
+          const attachAudioDiagnostics = (audio) => {
+            if (!audio || audio.__mobilewormDiagnosticsAttached) {
+              return;
+            }
+
+            audio.__mobilewormDiagnosticsAttached = true;
+            [
+              "loadstart",
+              "loadedmetadata",
+              "canplay",
+              "play",
+              "playing",
+              "pause",
+              "waiting",
+              "stalled",
+              "suspend",
+              "abort",
+              "ended",
+              "error"
+            ].forEach((name) => {
+              audio.addEventListener(name, () => {
+                send("audio_event", {
+                  message: name,
+                  ...describeAudio(audio)
+                });
+              });
+            });
+          };
+
+          const OriginalAudio = window.Audio;
+          if (typeof OriginalAudio === "function") {
+            const PatchedAudio = function(...args) {
+              const audio = new OriginalAudio(...args);
+              attachAudioDiagnostics(audio);
+              return audio;
+            };
+            PatchedAudio.prototype = OriginalAudio.prototype;
+            Object.setPrototypeOf(PatchedAudio, OriginalAudio);
+            window.Audio = PatchedAudio;
+          }
+
+          const scanForAudio = () => {
+            document.querySelectorAll("audio").forEach(attachAudioDiagnostics);
+          };
+
+          new MutationObserver(scanForAudio).observe(document.documentElement, {
+            childList: true,
+            subtree: true
+          });
+
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", () => {
+              send("dom_content_loaded");
+              scanForAudio();
+            }, { once: true });
+          } else {
+            send("document_ready", { readyState: document.readyState });
+            scanForAudio();
+          }
+        })();
+        """,
+        injectionTime: .atDocumentStart,
+        forMainFrameOnly: true
+    )
+
     final class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler, UIScrollViewDelegate {
         static let authStateHandler = "mobilewormAuthState"
         static let metadataCacheHandler = "mobilewormMetadataCache"
         static let downloadHandler = "mobilewormDownloads"
         static let nowPlayingHandler = "mobilewormNowPlaying"
+        static let diagnosticsHandler = "mobilewormDiagnostics"
 
         private let onAuthenticationStateChanged: (Bool) -> Void
         private let onLoadFailure: (String) -> Void
@@ -392,6 +536,12 @@ struct EarwormWebView: UIViewRepresentable {
             }
 
             pendingURL = url
+            Self.recordDiagnostic(
+                .info,
+                category: "webview",
+                message: "Preparing initial EarWorm load.",
+                metadata: ["url": url.absoluteString]
+            )
             seedDebugSessionCookieIfNeeded(for: url, in: webView)
         }
 
@@ -444,16 +594,44 @@ struct EarwormWebView: UIViewRepresentable {
 
             loadingURL = pendingURL.absoluteString
             self.pendingURL = nil
+            Self.recordDiagnostic(
+                .info,
+                category: "webview",
+                message: "Loading EarWorm URL in WKWebView.",
+                metadata: ["url": pendingURL.absoluteString]
+            )
             webView.load(URLRequest(url: pendingURL))
+        }
+
+        func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+            updateSnapshot(for: webView)
+            Self.recordDiagnostic(
+                .info,
+                category: "navigation",
+                message: "WKWebView started provisional navigation.",
+                metadata: ["url": webView.url?.absoluteString ?? loadingURL ?? "unknown"]
+            )
+        }
+
+        func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+            updateSnapshot(for: webView)
+            Self.recordDiagnostic(
+                .info,
+                category: "navigation",
+                message: "WKWebView committed navigation.",
+                metadata: ["url": webView.url?.absoluteString ?? "unknown"]
+            )
         }
 
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
             loadingURL = nil
+            updateSnapshot(for: webView)
             handleLoadFailure(error)
         }
 
         func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
             loadingURL = nil
+            updateSnapshot(for: webView)
             handleLoadFailure(error)
         }
 
@@ -461,6 +639,25 @@ struct EarwormWebView: UIViewRepresentable {
             loadingURL = webView.url?.absoluteString
             webView.evaluateJavaScript("window.__mobilewormBridgeSync?.()")
             syncDebugBrowserSessionIfNeeded(in: webView)
+            updateSnapshot(for: webView)
+            Self.recordDiagnostic(
+                .info,
+                category: "navigation",
+                message: "WKWebView finished navigation.",
+                metadata: [
+                    "url": webView.url?.absoluteString ?? "unknown",
+                    "title": webView.title ?? "",
+                ]
+            )
+        }
+
+        func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+            updateSnapshot(for: webView)
+            Self.recordDiagnostic(
+                .error,
+                category: "webview",
+                message: "WKWebView web content process terminated."
+            )
         }
 
         func viewForZooming(in scrollView: UIScrollView) -> UIView? {
@@ -481,6 +678,15 @@ struct EarwormWebView: UIViewRepresentable {
                     return
                 }
                 onAuthenticationStateChanged(authenticated)
+                EarwormWebView.diagnostics.updateAuthenticationState(authenticated)
+                Self.recordDiagnostic(
+                    authenticated ? .info : .warning,
+                    category: "auth",
+                    message: authenticated
+                        ? "Web app reported authenticated state."
+                        : "Web app reported signed-out state.",
+                    metadata: ["path": (body["path"] as? String) ?? ""]
+                )
             case Self.metadataCacheHandler:
                 guard
                     let body = message.body as? [String: Any],
@@ -538,6 +744,16 @@ struct EarwormWebView: UIViewRepresentable {
                     return
                 }
 
+                Self.recordDiagnostic(
+                    .debug,
+                    category: "downloads",
+                    message: "Received MobileWorm download bridge request.",
+                    metadata: [
+                        "action": (body["action"] as? String) ?? "unknown",
+                        "requestId": requestId,
+                    ]
+                )
+
                 Task {
                     await handleDownloadMessage(body, requestId: requestId)
                 }
@@ -550,6 +766,8 @@ struct EarwormWebView: UIViewRepresentable {
                 }
 
                 if action == "clear" {
+                    EarwormWebView.diagnostics.updateNowPlayingSummary(nil)
+                    Self.recordDiagnostic(.info, category: "now_playing", message: "Cleared now playing state.")
                     Task {
                         await WebNowPlayingManager.shared.clear()
                     }
@@ -560,10 +778,31 @@ struct EarwormWebView: UIViewRepresentable {
                     return
                 }
 
+                EarwormWebView.diagnostics.updateNowPlayingSummary(
+                    "\(payload.title) — \(payload.artistName) | playing=\(payload.isPlaying)"
+                )
+                Self.recordDiagnostic(
+                    .info,
+                    category: "now_playing",
+                    message: "Updated native now playing state.",
+                    metadata: [
+                        "title": payload.title,
+                        "artist": payload.artistName,
+                        "isPlaying": payload.isPlaying ? "true" : "false",
+                        "position": String(payload.position),
+                        "duration": String(payload.duration),
+                    ]
+                )
+
                 Task {
                     let cookies = await cookies(for: payload.artworkURL)
                     await WebNowPlayingManager.shared.update(payload: payload, cookies: cookies)
                 }
+            case Self.diagnosticsHandler:
+                guard let body = message.body as? [String: Any] else {
+                    return
+                }
+                handleDiagnosticsMessage(body)
             default:
                 break
             }
@@ -831,6 +1070,14 @@ struct EarwormWebView: UIViewRepresentable {
                 return
             }
 
+            let message = error.localizedDescription
+            EarwormWebView.diagnostics.markLoadFailure(message)
+            Self.recordDiagnostic(
+                .error,
+                category: "navigation",
+                message: "WKWebView load failed.",
+                metadata: ["error": message]
+            )
             onLoadFailure(error.localizedDescription)
         }
 
@@ -883,6 +1130,45 @@ struct EarwormWebView: UIViewRepresentable {
             """
 
             webView.evaluateJavaScript(script)
+        }
+
+        private func handleDiagnosticsMessage(_ body: [String: Any]) {
+            let event = (body["event"] as? String) ?? "unknown"
+            let message = (body["message"] as? String) ?? event
+            var metadata: [String: String] = [:]
+            for (key, value) in body where key != "event" && key != "message" {
+                metadata[key] = String(describing: value)
+            }
+
+            let level: AppDiagnosticsStore.Level
+            switch event {
+            case "console_error", "window_error", "unhandled_rejection":
+                level = .error
+            case "console_warn", "audio_event":
+                level = .warning
+            default:
+                level = .debug
+            }
+
+            Self.recordDiagnostic(level, category: "web_\(event)", message: message, metadata: metadata)
+        }
+
+        private func updateSnapshot(for webView: WKWebView) {
+            EarwormWebView.diagnostics.updateWebViewState(
+                url: webView.url?.absoluteString ?? loadingURL,
+                title: webView.title,
+                isLoading: webView.isLoading,
+                estimatedProgress: webView.estimatedProgress
+            )
+        }
+
+        private static func recordDiagnostic(
+            _ level: AppDiagnosticsStore.Level,
+            category: String,
+            message: String,
+            metadata: [String: String] = [:]
+        ) {
+            EarwormWebView.diagnostics.record(level, category: category, message: message, metadata: metadata)
         }
 
         @MainActor

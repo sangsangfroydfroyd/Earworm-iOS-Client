@@ -7,6 +7,7 @@ struct WebContainerView: View {
 
     @State private var isShowingChangeServerDialog = false
     @State private var isAuthenticated = false
+    private let diagnostics = AppDiagnosticsStore.shared
 
     var body: some View {
         Group {
@@ -49,6 +50,25 @@ struct WebContainerView: View {
                     description: Text("The saved EarWorm server URL is invalid. Change the server to continue.")
                 )
             }
+        }
+        .onAppear {
+            diagnostics.updateServerURL(server.baseURL)
+            diagnostics.record(
+                .info,
+                category: "web_container",
+                message: "Opened embedded EarWorm web container.",
+                metadata: ["serverURL": server.baseURL]
+            )
+        }
+        .onChange(of: isAuthenticated) { _, authenticated in
+            diagnostics.updateAuthenticationState(authenticated)
+            diagnostics.record(
+                authenticated ? .info : .warning,
+                category: "auth",
+                message: authenticated
+                    ? "Embedded EarWorm session is authenticated."
+                    : "Embedded EarWorm session is not authenticated."
+            )
         }
         .confirmationDialog(
             "Change Server",

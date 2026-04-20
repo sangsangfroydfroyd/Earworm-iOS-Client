@@ -14,30 +14,30 @@ Not recorded.
 
 ## Recent Changes
 
-Updated 7 files
+Analyzed MobileWorm-only playback with in-app diagnostics. The copied diagnostics showed native now-playing flipping between playing and paused every 1-2 seconds while Safari playback stayed stable, pointing at the MobileWorm bridge layer rather than the EarWorm mobile UI. Patched WebNowPlayingManager to stop reactivating AVAudioSession on every now-playing update, and improved diagnostics to hook detached Audio() instances so future reports include real play/pause/error events from EarWorm's browser playback element. Rebuilt simulator and security checks passed.
 
-Reason: Captured after Bash | command: grep -c "^}" /Volumes/T7/projects/earworm/src-tauri/src/services/recommendation_engine.rs | head -1 wc -l /Volumes/T7...
-Outcome: Working tree changed and was recorded in app memory.
+Reason: Cross-CLI handoff — codex session ended.
+Outcome: Handoff recorded.
 - .app-freedom/memory/current.json
 - .app-freedom/memory/current.md
+- .app-freedom/memory/handoff-latest.md
 - .app-freedom/memory/history/events.jsonl
 - .app-freedom/memory/mempalace/current-snapshot.md
 - .app-freedom/memory/mempalace/status.json
-- Mobileworm/Features/Web/EarwormWebView.swift
-- Mobileworm/Features/Web/WebNowPlayingManager.swift
-- Mobileworm/Features/Web/WebDownloadManager.swift
-- mobileworm.xcodeproj/project.pbxproj
-- project.yml
-- Mobileworm/Info.plist
-- .app-freedom/memory/handoff-latest.md
 - .handoff.md
 - .ideas/open-questions.md
-- Mobileworm/Features/Connect/ConnectServerView.swift
-- Mobileworm/Services/ServerValidationService.swift
-- .app-freedom/memory/mempalace/events/2026-04-18T232746284Z-handoff-1e4615/2026-04-18T23-27-46-284Z-handoff-2026-04-18T232746284Z-handoff-1e4615.md
-- .app-freedom/memory/mempalace/events/2026-04-18T232746284Z-handoff-1e4615/mempalace.yaml
-- Mobileworm/Features/Web/WebMetadataCache.swift
 - Mobileworm/App/AppModel.swift
+- Mobileworm/App/RootView.swift
+- Mobileworm/Features/Recovery/RecoveryView.swift
+- Mobileworm/Features/Web/EarwormWebView.swift
+- Mobileworm/Features/Web/WebContainerView.swift
+- Mobileworm/Features/Web/WebNowPlayingManager.swift
+- mobileworm.xcodeproj/project.pbxproj
+- .app-freedom/memory/mempalace/events/2026-04-20T052059995Z-handoff-d3b68d/2026-04-20T05-20-59-995Z-handoff-2026-04-20T052059995Z-handoff-d3b68d.md
+- .app-freedom/memory/mempalace/events/2026-04-20T052059995Z-handoff-d3b68d/mempalace.yaml
+- Mobileworm/Shared/AppDiagnostics.swift
+- Mobileworm/Shared/DiagnosticsSheet.swift
+- Mobileworm/Features/Web/WebDownloadManager.swift
 
 ## Decisions
 
@@ -59,10 +59,12 @@ Outcome: Working tree changed and was recorded in app memory.
 
 ## Blockers / Open Issues
 
-- Dynamic Island artwork and Files app browse behavior still need physical device or full simulator interaction with a live server to verify end to end.
+- none
 
 ## Failed Attempts / Future-Self Notes
 
+- Analyzed MobileWorm-only playback with in-app diagnostics. The copied diagnostics showed native now-playing flipping between playing and paused every 1-2 seconds while Safari playback stayed stable, pointing at the MobileWorm bridge layer rather than the EarWorm mobile UI. Patched WebNowPlayingManager to stop reactivating AVAudioSession on every now-playing update, and improved diagnostics to hook detached Audio() instances so future reports include real play/pause/error events from EarWorm's...
+- Added in-app iOS diagnostics capture for MobileWorm with a shareable diagnostics sheet, WebView/app state snapshot, and event logging for navigation, auth, JS errors, console warnings/errors, audio element lifecycle, downloads, and now-playing updates. Verified by building/running in the iOS simulator and confirming the diagnostics UI opens and shows live state and captured events.
 - Added native WKWebView bridges for original track downloads and lock-screen now-playing metadata/artwork. Downloads use authenticated URLSession writes into Documents/EarWorm Downloads exposed through Files; Info.plist now enables file sharing, opening in place, and audio background mode. Validated with xcodegen, iOS simulator build, built Info.plist inspection, scoped security checks, and simulator launch.
 - Added native WKWebView bridges for original track downloads and lock-screen now-playing metadata/artwork. Downloads use authenticated URLSession writes into Documents/EarWorm Downloads exposed through Files; Info.plist now enables file sharing, opening in place, and audio background mode. Validated with xcodegen, iOS simulator build, built Info.plist inspection, and scoped security checks.
 - Removed the brittle WKWebView artwork interception that blanked EarWorm images and replaced it with a native metadata cache bridge. MobileWorm now injects a bridge for cached EarWorm JSON payloads, persists those snapshots in the app cache directory, keeps native safe-area handling intact, and surfaces EarWorm branding in the iOS shell. Xcode 26.4 build passed, mobileworm security scan had no findings, and the simulator now renders the real EarWorm Home screen with artwork tiles again.
@@ -81,8 +83,6 @@ Outcome: Working tree changed and was recorded in app memory.
 - If /api/auth/status returns HTTP 530/Cloudflare 1033, the app is not failing identity validation; Cloudflare cannot reach the EarWorm origin.
 - Aligned mobileworm to use EarWorm's existing mobile web UI by removing native WebView toolbar/title chrome, adding a WebKit bridge that injects an EarWorm-styled Change Server button only on the web login screen, and updating status docs after successful simulator/security validation.
 - The next meaningful runtime test should use a real HTTPS EarWorm server to verify validation, saving, and WKWebView login behavior end-to-end.
-- Once full Xcode is available, the first follow-up should be xcodegen generate, xcodebuild -list, and a simulator build to catch any SwiftUI or project-setting issues.
-- Completed /plan for mobileworm. Defined the app as an iPhone-first SwiftUI shell with WKWebView reuse of EarWorm's existing mobile UI, lightweight saved-server persistence, HTTPS-only validation, and a staged plan for foundation, validation hardening, recovery flows, and TestFlight QA.
 
 ## Next Step
 

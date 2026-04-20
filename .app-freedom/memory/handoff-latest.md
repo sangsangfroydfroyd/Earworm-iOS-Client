@@ -2,19 +2,11 @@
 
 - App: mobileworm
 - From CLI: codex
-- Timestamp: 2026-04-19T03:13:02.068Z
+- Timestamp: 2026-04-20T05:49:24.137Z
 
 ## What Was Accomplished
 
-Added native WKWebView bridges for original track downloads and lock-screen now-playing metadata/artwork. Downloads use authenticated URLSession writes into Documents/EarWorm Downloads exposed through Files; Info.plist now enables file sharing, opening in place, and audio background mode. Validated with xcodegen, iOS simulator build, built Info.plist inspection, scoped security checks, and simulator launch.
-
-## Next Step
-
-Runtime test against the live EarWorm LAN server: play a track, lock the device, and confirm title/artist/artwork; use a mobile track row menu to download and confirm the file appears in Files > EarWorm > EarWorm Downloads.
-
-## Blockers
-
-Dynamic Island artwork and Files app browse behavior still need physical device or full simulator interaction with a live server to verify end to end.
+Analyzed MobileWorm-only playback with in-app diagnostics. The copied diagnostics showed native now-playing flipping between playing and paused every 1-2 seconds while Safari playback stayed stable, pointing at the MobileWorm bridge layer rather than the EarWorm mobile UI. Patched WebNowPlayingManager to stop reactivating AVAudioSession on every now-playing update, and improved diagnostics to hook detached Audio() instances so future reports include real play/pause/error events from EarWorm's browser playback element. Rebuilt simulator and security checks passed.
 
 ## Resume Instructions
 

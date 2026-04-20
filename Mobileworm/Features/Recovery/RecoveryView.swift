@@ -6,6 +6,7 @@ struct RecoveryView: View {
     let onRetry: () async -> Void
     let onChangeServer: () -> Void
     let onOpenInSafari: () -> Void
+    @State private var isShowingDiagnostics = false
 
     var body: some View {
         VStack(spacing: 24) {
@@ -53,11 +54,20 @@ struct RecoveryView: View {
                 Button("Open in Safari", action: onOpenInSafari)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
+
+                Button("View Diagnostics") {
+                    isShowingDiagnostics = true
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
             }
 
             Spacer()
         }
         .padding(24)
         .navigationBarBackButtonHidden(true)
+        .sheet(isPresented: $isShowingDiagnostics) {
+            DiagnosticsSheet(diagnostics: AppDiagnosticsStore.shared)
+        }
     }
 }

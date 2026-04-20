@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		08E28C6112053299D8051AE6 /* SavedServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35F45F7AF4965A1B63E7FE19 /* SavedServer.swift */; };
+		0F1D4BAA8A7B4AFBA8A14A11 /* AppDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F1D4BA98A7B4AFBA8A14A11 /* AppDiagnostics.swift */; };
 		34F58BEFA6489F8AE7DAED21 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94926CF37F414D7B7D428488 /* LoadingView.swift */; };
 		35535DF731838CCD49E7F333 /* WebNowPlayingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DF66FB86E633E625016F16 /* WebNowPlayingManager.swift */; };
 		405CDFE07E689DCEC1EE80F5 /* RecoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A267C2E6989D83617639A4 /* RecoveryView.swift */; };
@@ -20,12 +21,14 @@
 		CA4C605E049BE5EF68220B53 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42CE9DD8647ECBB940FCE688 /* AppModel.swift */; };
 		CC49C95B233AD3838F9ABD4D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3BFF0BB0E06D312DD6B515E8 /* Assets.xcassets */; };
 		D4DBD0F919D9D8CB3A92354B /* MobilewormApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E716B5AB2D89DB67665E918 /* MobilewormApp.swift */; };
+		D4DBD0FA19D9D8CB3A92354B /* DiagnosticsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4DBD0FB19D9D8CB3A92354B /* DiagnosticsSheet.swift */; };
 		D762B2C46D7A9E3077084116 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551B3098790B88827ED3D54B /* RootView.swift */; };
 		EB357829FB86542DA5CB25F0 /* ServerValidationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695729A4BE43908834C96F13 /* ServerValidationService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0E716B5AB2D89DB67665E918 /* MobilewormApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobilewormApp.swift; sourceTree = "<group>"; };
+		0F1D4BA98A7B4AFBA8A14A11 /* AppDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDiagnostics.swift; sourceTree = "<group>"; };
 		35F45F7AF4965A1B63E7FE19 /* SavedServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedServer.swift; sourceTree = "<group>"; };
 		391190BF7C324C8924114B2C /* WebDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDownloadManager.swift; sourceTree = "<group>"; };
 		3BFF0BB0E06D312DD6B515E8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -37,6 +40,7 @@
 		94926CF37F414D7B7D428488 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		CD2FF2B802AF4631BA00B461 /* SavedServerStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedServerStore.swift; sourceTree = "<group>"; };
 		D3F270529C78FF226D2E3510 /* ConnectServerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectServerView.swift; sourceTree = "<group>"; };
+		D4DBD0FB19D9D8CB3A92354B /* DiagnosticsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsSheet.swift; sourceTree = "<group>"; };
 		DA44DC59A86ACFDF8CEC9A73 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		DCA57464664F6CE62C53EF40 /* EarwormWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EarwormWebView.swift; sourceTree = "<group>"; };
 		E9A267C2E6989D83617639A4 /* RecoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryView.swift; sourceTree = "<group>"; };
@@ -143,6 +147,8 @@
 		FC4DEAABD1CADC0E263CCC99 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				0F1D4BA98A7B4AFBA8A14A11 /* AppDiagnostics.swift */,
+				D4DBD0FB19D9D8CB3A92354B /* DiagnosticsSheet.swift */,
 				94926CF37F414D7B7D428488 /* LoadingView.swift */,
 			);
 			path = Shared;
@@ -219,7 +225,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA4C605E049BE5EF68220B53 /* AppModel.swift in Sources */,
+				0F1D4BAA8A7B4AFBA8A14A11 /* AppDiagnostics.swift in Sources */,
 				9A0937DB392382AB5CD6882A /* ConnectServerView.swift in Sources */,
+				D4DBD0FA19D9D8CB3A92354B /* DiagnosticsSheet.swift in Sources */,
 				54251596EA98C853D1E956FB /* EarwormWebView.swift in Sources */,
 				34F58BEFA6489F8AE7DAED21 /* LoadingView.swift in Sources */,
 				D4DBD0F919D9D8CB3A92354B /* MobilewormApp.swift in Sources */,

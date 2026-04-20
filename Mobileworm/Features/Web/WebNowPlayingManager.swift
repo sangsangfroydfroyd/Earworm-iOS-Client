@@ -73,8 +73,6 @@ final class WebNowPlayingManager {
     }
 
     func update(payload: WebNowPlayingPayload, cookies: [HTTPCookie]) {
-        activateAudioSession()
-
         var info = baseNowPlayingInfo(for: payload)
         if
             let artworkURLString = payload.artworkURL?.absoluteString,
