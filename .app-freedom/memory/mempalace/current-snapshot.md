@@ -1,8 +1,8 @@
 # App Freedom Compatibility Snapshot: mobileworm
 
-Generated: 2026-04-20T05:49:24.133Z
+Generated: 2026-04-20T18:43:20.730Z
 Configured backend: mempalace
-Active backend: mempalace
+Active backend: app_freedom
 
 This file remains as a deterministic App Freedom resume snapshot while MemPalace is the primary long-term memory backend.
 
@@ -16,6 +16,6 @@ Not recorded.
 
 ## Latest Change
 
-Analyzed MobileWorm-only playback with in-app diagnostics. The copied diagnostics showed native now-playing flipping between playing and paused every 1-2 seconds while Safari playback stayed stable, pointing at the MobileWorm bridge layer rather than the EarWorm mobile UI. Patched WebNowPlayingManager to stop reactivating AVAudioSession on every now-playing update, and improved diagnostics to hook detached Audio() instances so future reports include real play/pause/error events from EarWorm's browser playback element. Rebuilt simulator and security checks passed.
+Removed the native floating settings gear and added a WKWebView developer bridge so EarWorm's mobile settings page can open the native diagnostics sheet on demand.
 
-Next step: Runtime test against the live EarWorm LAN server: play a track, lock the device, and confirm title/artist/artwork; use a mobile track row menu to download and confirm the file appears in Files > EarWorm > EarWorm Downloads.
+Next step: Launch MobileWorm, confirm the floating gear no longer appears, then use EarWorm's settings page developer section to open diagnostics and verify native logs still appear.

@@ -5,6 +5,7 @@ import WebKit
 struct EarwormWebView: UIViewRepresentable {
     let url: URL
     let onAuthenticationStateChanged: (Bool) -> Void
+    let onOpenDiagnostics: () -> Void
     let onLoadFailure: (String) -> Void
 
     private static let debugSessionCookieName = "earworm_session"
@@ -13,6 +14,7 @@ struct EarwormWebView: UIViewRepresentable {
     func makeCoordinator() -> Coordinator {
         Coordinator(
             onAuthenticationStateChanged: onAuthenticationStateChanged,
+            onOpenDiagnostics: onOpenDiagnostics,
             onLoadFailure: onLoadFailure
         )
     }
@@ -34,11 +36,13 @@ struct EarwormWebView: UIViewRepresentable {
         configuration.userContentController.addUserScript(Self.downloadBridgeScript)
         configuration.userContentController.addUserScript(Self.nowPlayingBridgeScript)
         configuration.userContentController.addUserScript(Self.diagnosticsBridgeScript)
+        configuration.userContentController.addUserScript(Self.developerBridgeScript)
         configuration.userContentController.add(context.coordinator, name: Coordinator.authStateHandler)
         configuration.userContentController.add(context.coordinator, name: Coordinator.metadataCacheHandler)
         configuration.userContentController.add(context.coordinator, name: Coordinator.downloadHandler)
         configuration.userContentController.add(context.coordinator, name: Coordinator.nowPlayingHandler)
         configuration.userContentController.add(context.coordinator, name: Coordinator.diagnosticsHandler)
+        configuration.userContentController.add(context.coordinator, name: Coordinator.developerHandler)
 
         let webView = WKWebView(frame: .zero, configuration: configuration)
         context.coordinator.webView = webView
@@ -64,6 +68,7 @@ struct EarwormWebView: UIViewRepresentable {
         webView.configuration.userContentController.removeScriptMessageHandler(forName: Coordinator.downloadHandler)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: Coordinator.nowPlayingHandler)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: Coordinator.diagnosticsHandler)
+        webView.configuration.userContentController.removeScriptMessageHandler(forName: Coordinator.developerHandler)
         WebNowPlayingManager.shared.detach(webView: webView)
         webView.scrollView.delegate = nil
         coordinator.webView = nil
@@ -507,14 +512,36 @@ struct EarwormWebView: UIViewRepresentable {
         forMainFrameOnly: true
     )
 
+    private static let developerBridgeScript = WKUserScript(
+        source: """
+        (() => {
+          const developerHandler = window.webkit?.messageHandlers?.mobilewormDeveloper;
+          if (!developerHandler || window.__mobilewormDeveloperBridgeInstalled) {
+            return;
+          }
+
+          window.__mobilewormDeveloperBridgeInstalled = true;
+          window.__mobilewormDeveloper = {
+            openDiagnostics() {
+              developerHandler.postMessage({ action: "openDiagnostics" });
+            }
+          };
+        })();
+        """,
+        injectionTime: .atDocumentStart,
+        forMainFrameOnly: true
+    )
+
     final class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler, UIScrollViewDelegate {
         static let authStateHandler = "mobilewormAuthState"
         static let metadataCacheHandler = "mobilewormMetadataCache"
         static let downloadHandler = "mobilewormDownloads"
         static let nowPlayingHandler = "mobilewormNowPlaying"
         static let diagnosticsHandler = "mobilewormDiagnostics"
+        static let developerHandler = "mobilewormDeveloper"
 
         private let onAuthenticationStateChanged: (Bool) -> Void
+        private let onOpenDiagnostics: () -> Void
         private let onLoadFailure: (String) -> Void
         private var pendingURL: URL?
         private var loadingURL: String?
@@ -524,14 +551,19 @@ struct EarwormWebView: UIViewRepresentable {
 
         init(
             onAuthenticationStateChanged: @escaping (Bool) -> Void,
+            onOpenDiagnostics: @escaping () -> Void,
             onLoadFailure: @escaping (String) -> Void
         ) {
             self.onAuthenticationStateChanged = onAuthenticationStateChanged
+            self.onOpenDiagnostics = onOpenDiagnostics
             self.onLoadFailure = onLoadFailure
         }
 
         func prepareInitialLoad(for url: URL, in webView: WKWebView) {
-            guard loadingURL != url.absoluteString, webView.url?.absoluteString != url.absoluteString else {
+            let targetURL = Self.normalizedLoadTarget(for: url)
+            let currentLoadingURL = Self.normalizedLoadTarget(for: loadingURL)
+            let currentWebViewURL = Self.normalizedLoadTarget(for: webView.url)
+            guard targetURL != currentLoadingURL, targetURL != currentWebViewURL else {
                 return
             }
 
@@ -592,7 +624,7 @@ struct EarwormWebView: UIViewRepresentable {
                 return
             }
 
-            loadingURL = pendingURL.absoluteString
+            loadingURL = Self.normalizedLoadTarget(for: pendingURL)
             self.pendingURL = nil
             Self.recordDiagnostic(
                 .info,
@@ -803,6 +835,23 @@ struct EarwormWebView: UIViewRepresentable {
                     return
                 }
                 handleDiagnosticsMessage(body)
+            case Self.developerHandler:
+                guard
+                    let body = message.body as? [String: Any],
+                    let action = body["action"] as? String,
+                    action == "openDiagnostics"
+                else {
+                    return
+                }
+
+                Self.recordDiagnostic(
+                    .info,
+                    category: "developer",
+                    message: "Opening native MobileWorm diagnostics from EarWorm settings."
+                )
+                Task { @MainActor in
+                    onOpenDiagnostics()
+                }
             default:
                 break
             }
@@ -1160,6 +1209,34 @@ struct EarwormWebView: UIViewRepresentable {
                 isLoading: webView.isLoading,
                 estimatedProgress: webView.estimatedProgress
             )
+        }
+
+        private static func normalizedLoadTarget(for rawURL: String?) -> String? {
+            guard let rawURL else {
+                return nil
+            }
+
+            guard let url = URL(string: rawURL) else {
+                return rawURL
+            }
+
+            return normalizedLoadTarget(for: url)
+        }
+
+        private static func normalizedLoadTarget(for url: URL?) -> String? {
+            guard let url else {
+                return nil
+            }
+
+            guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+                return url.absoluteString
+            }
+
+            if components.path.isEmpty {
+                components.path = "/"
+            }
+            components.fragment = nil
+            return components.string ?? url.absoluteString
         }
 
         private static func recordDiagnostic(

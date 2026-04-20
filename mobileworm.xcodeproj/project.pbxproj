@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		08E28C6112053299D8051AE6 /* SavedServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35F45F7AF4965A1B63E7FE19 /* SavedServer.swift */; };
 		0F1D4BAA8A7B4AFBA8A14A11 /* AppDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F1D4BA98A7B4AFBA8A14A11 /* AppDiagnostics.swift */; };
+		126FAD7536E3735EF1B6DCAA /* AppSettingsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 126FAD7436E3735EF1B6DCAA /* AppSettingsSheet.swift */; };
 		34F58BEFA6489F8AE7DAED21 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94926CF37F414D7B7D428488 /* LoadingView.swift */; };
 		35535DF731838CCD49E7F333 /* WebNowPlayingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DF66FB86E633E625016F16 /* WebNowPlayingManager.swift */; };
 		405CDFE07E689DCEC1EE80F5 /* RecoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A267C2E6989D83617639A4 /* RecoveryView.swift */; };
@@ -29,6 +30,7 @@
 /* Begin PBXFileReference section */
 		0E716B5AB2D89DB67665E918 /* MobilewormApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobilewormApp.swift; sourceTree = "<group>"; };
 		0F1D4BA98A7B4AFBA8A14A11 /* AppDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDiagnostics.swift; sourceTree = "<group>"; };
+		126FAD7436E3735EF1B6DCAA /* AppSettingsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsSheet.swift; sourceTree = "<group>"; };
 		35F45F7AF4965A1B63E7FE19 /* SavedServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedServer.swift; sourceTree = "<group>"; };
 		391190BF7C324C8924114B2C /* WebDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDownloadManager.swift; sourceTree = "<group>"; };
 		3BFF0BB0E06D312DD6B515E8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -148,6 +150,7 @@
 			isa = PBXGroup;
 			children = (
 				0F1D4BA98A7B4AFBA8A14A11 /* AppDiagnostics.swift */,
+				126FAD7436E3735EF1B6DCAA /* AppSettingsSheet.swift */,
 				D4DBD0FB19D9D8CB3A92354B /* DiagnosticsSheet.swift */,
 				94926CF37F414D7B7D428488 /* LoadingView.swift */,
 			);
@@ -226,6 +229,7 @@
 			files = (
 				CA4C605E049BE5EF68220B53 /* AppModel.swift in Sources */,
 				0F1D4BAA8A7B4AFBA8A14A11 /* AppDiagnostics.swift in Sources */,
+				126FAD7536E3735EF1B6DCAA /* AppSettingsSheet.swift in Sources */,
 				9A0937DB392382AB5CD6882A /* ConnectServerView.swift in Sources */,
 				D4DBD0FA19D9D8CB3A92354B /* DiagnosticsSheet.swift in Sources */,
 				54251596EA98C853D1E956FB /* EarwormWebView.swift in Sources */,

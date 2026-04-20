@@ -2,11 +2,15 @@
 
 - App: mobileworm
 - From CLI: codex
-- Timestamp: 2026-04-20T05:49:24.137Z
+- Timestamp: 2026-04-20T18:43:20.736Z
 
 ## What Was Accomplished
 
-Analyzed MobileWorm-only playback with in-app diagnostics. The copied diagnostics showed native now-playing flipping between playing and paused every 1-2 seconds while Safari playback stayed stable, pointing at the MobileWorm bridge layer rather than the EarWorm mobile UI. Patched WebNowPlayingManager to stop reactivating AVAudioSession on every now-playing update, and improved diagnostics to hook detached Audio() instances so future reports include real play/pause/error events from EarWorm's browser playback element. Rebuilt simulator and security checks passed.
+Removed the native floating settings gear and added a WKWebView developer bridge so EarWorm's mobile settings page can open the native diagnostics sheet on demand.
+
+## Next Step
+
+Launch MobileWorm, confirm the floating gear no longer appears, then use EarWorm's settings page developer section to open diagnostics and verify native logs still appear.
 
 ## Resume Instructions
 

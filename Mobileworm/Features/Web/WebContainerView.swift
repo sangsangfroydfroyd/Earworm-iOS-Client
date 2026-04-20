@@ -3,6 +3,7 @@ import SwiftUI
 struct WebContainerView: View {
     let server: SavedServer
     let onChangeServer: () -> Void
+    let onOpenDiagnostics: () -> Void
     let onLoadFailure: (String) -> Void
 
     @State private var isShowingChangeServerDialog = false
@@ -16,6 +17,7 @@ struct WebContainerView: View {
                     EarwormWebView(
                         url: url,
                         onAuthenticationStateChanged: { isAuthenticated = $0 },
+                        onOpenDiagnostics: onOpenDiagnostics,
                         onLoadFailure: onLoadFailure
                     )
                     .ignoresSafeArea(.container)

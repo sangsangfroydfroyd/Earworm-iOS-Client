@@ -14,10 +14,10 @@ Not recorded.
 
 ## Recent Changes
 
-Analyzed MobileWorm-only playback with in-app diagnostics. The copied diagnostics showed native now-playing flipping between playing and paused every 1-2 seconds while Safari playback stayed stable, pointing at the MobileWorm bridge layer rather than the EarWorm mobile UI. Patched WebNowPlayingManager to stop reactivating AVAudioSession on every now-playing update, and improved diagnostics to hook detached Audio() instances so future reports include real play/pause/error events from EarWorm's browser playback element. Rebuilt simulator and security checks passed.
+Removed the native floating settings gear and added a WKWebView developer bridge so EarWorm's mobile settings page can open the native diagnostics sheet on demand.
 
 Reason: Cross-CLI handoff — codex session ended.
-Outcome: Handoff recorded.
+Outcome: Next step: Launch MobileWorm, confirm the floating gear no longer appears, then use EarWorm's settings page developer section to open diagnostics and verify native logs still appear.
 - .app-freedom/memory/current.json
 - .app-freedom/memory/current.md
 - .app-freedom/memory/handoff-latest.md
@@ -26,18 +26,18 @@ Outcome: Handoff recorded.
 - .app-freedom/memory/mempalace/status.json
 - .handoff.md
 - .ideas/open-questions.md
-- Mobileworm/App/AppModel.swift
 - Mobileworm/App/RootView.swift
-- Mobileworm/Features/Recovery/RecoveryView.swift
 - Mobileworm/Features/Web/EarwormWebView.swift
 - Mobileworm/Features/Web/WebContainerView.swift
-- Mobileworm/Features/Web/WebNowPlayingManager.swift
 - mobileworm.xcodeproj/project.pbxproj
-- .app-freedom/memory/mempalace/events/2026-04-20T052059995Z-handoff-d3b68d/2026-04-20T05-20-59-995Z-handoff-2026-04-20T052059995Z-handoff-d3b68d.md
-- .app-freedom/memory/mempalace/events/2026-04-20T052059995Z-handoff-d3b68d/mempalace.yaml
-- Mobileworm/Shared/AppDiagnostics.swift
-- Mobileworm/Shared/DiagnosticsSheet.swift
-- Mobileworm/Features/Web/WebDownloadManager.swift
+- .app-freedom/memory/mempalace/events/2026-04-20T060056379Z-handoff-8bd371/2026-04-20T06-00-56-380Z-handoff-2026-04-20T060056379Z-handoff-8bd371.md
+- .app-freedom/memory/mempalace/events/2026-04-20T060056379Z-handoff-8bd371/mempalace.yaml
+- .app-freedom/memory/mempalace/events/2026-04-20T180044004Z-handoff-317a0e/2026-04-20T18-00-44-005Z-handoff-2026-04-20T180044004Z-handoff-317a0e.md
+- .app-freedom/memory/mempalace/events/2026-04-20T180044004Z-handoff-317a0e/mempalace.yaml
+- Mobileworm/Shared/AppSettingsSheet.swift
+- Mobileworm/App/AppModel.swift
+- Mobileworm/Features/Recovery/RecoveryView.swift
+- Mobileworm/Features/Web/WebNowPlayingManager.swift
 
 ## Decisions
 
@@ -63,6 +63,9 @@ Outcome: Handoff recorded.
 
 ## Failed Attempts / Future-Self Notes
 
+- Removed the native floating settings gear and added a WKWebView developer bridge so EarWorm's mobile settings page can open the native diagnostics sheet on demand.
+- Moved MobileWorm diagnostics out of the global floating debug button and into a native Settings sheet under a Developer section. Added AppSettingsSheet with current server info and change-server action, replaced the root overlay icon with a settings gear, and verified in the iOS simulator that Settings opens first and Diagnostics launches from Developer.
+- Used the new diagnostics report to fix remaining MobileWorm integration issues. Patched EarwormWebView URL loading to normalize same-page URLs so the app stops reloading https://host and https://host/ as different pages, which was causing auth churn and repeated provisional navigations. Rebuilt simulator and security check passed.
 - Analyzed MobileWorm-only playback with in-app diagnostics. The copied diagnostics showed native now-playing flipping between playing and paused every 1-2 seconds while Safari playback stayed stable, pointing at the MobileWorm bridge layer rather than the EarWorm mobile UI. Patched WebNowPlayingManager to stop reactivating AVAudioSession on every now-playing update, and improved diagnostics to hook detached Audio() instances so future reports include real play/pause/error events from EarWorm's...
 - Added in-app iOS diagnostics capture for MobileWorm with a shareable diagnostics sheet, WebView/app state snapshot, and event logging for navigation, auth, JS errors, console warnings/errors, audio element lifecycle, downloads, and now-playing updates. Verified by building/running in the iOS simulator and confirming the diagnostics UI opens and shows live state and captured events.
 - Added native WKWebView bridges for original track downloads and lock-screen now-playing metadata/artwork. Downloads use authenticated URLSession writes into Documents/EarWorm Downloads exposed through Files; Info.plist now enables file sharing, opening in place, and audio background mode. Validated with xcodegen, iOS simulator build, built Info.plist inspection, scoped security checks, and simulator launch.
@@ -80,13 +83,10 @@ Outcome: Handoff recorded.
 - Live simulator validation now passes for https://earworm.sillytina.fun. The app validates the EarWorm server, saves it, opens EarWorm's existing mobile login UI in WKWebView with no native browser toolbar, and the login-screen Change EarWorm Server control returns to first-launch server entry. Replaced the unreliable DOM-injected change-server button with a native EarWorm-styled overlay shown only while unauthenticated.
 - If testing login-screen Change Server, use the accessibility label Change EarWorm Server; coordinate screenshots may not match AX coordinates in the WebView.
 - Validated provided EarWorm URL for mobileworm. Direct HTTPS initially returned EarWorm auth status, but the Cloudflare tunnel then began returning HTTP 530 / error 1033 for both curl and the iOS validator. mobileworm launched in the simulator, accepted the URL, and correctly stayed on first-launch with 'EarWorm returned HTTP 530.'
-- If /api/auth/status returns HTTP 530/Cloudflare 1033, the app is not failing identity validation; Cloudflare cannot reach the EarWorm origin.
-- Aligned mobileworm to use EarWorm's existing mobile web UI by removing native WebView toolbar/title chrome, adding a WebKit bridge that injects an EarWorm-styled Change Server button only on the web login screen, and updating status docs after successful simulator/security validation.
-- The next meaningful runtime test should use a real HTTPS EarWorm server to verify validation, saving, and WKWebView login behavior end-to-end.
 
 ## Next Step
 
-Runtime test against the live EarWorm LAN server: play a track, lock the device, and confirm title/artist/artwork; use a mobile track row menu to download and confirm the file appears in Files > EarWorm > EarWorm Downloads.
+Launch MobileWorm, confirm the floating gear no longer appears, then use EarWorm's settings page developer section to open diagnostics and verify native logs still appear.
 
 ## Warning
 
