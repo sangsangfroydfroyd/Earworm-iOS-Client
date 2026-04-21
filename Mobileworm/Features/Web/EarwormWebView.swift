@@ -289,23 +289,260 @@ struct EarwormWebView: UIViewRepresentable {
           }
 
           window.__mobilewormNowPlayingBridgeInstalled = true;
+          const mediaSession = navigator.mediaSession;
+          const diagnosticsHandler = window.webkit?.messageHandlers?.mobilewormDiagnostics;
+          let lastNowPlayingState = null;
+          const emitDiagnostics = (message, metadata = {}) => {
+            diagnosticsHandler?.postMessage({
+              event: "remote_command",
+              message,
+              metadata
+            });
+          };
+          const summarizeState = () => ({
+            title: lastNowPlayingState?.title ?? "",
+            artistName: lastNowPlayingState?.artistName ?? "",
+            isPlaying: lastNowPlayingState?.isPlaying ?? false
+          });
+          const sameTrack = (lhs, rhs) =>
+            lhs.title === rhs.title &&
+            lhs.artistName === rhs.artistName;
+          const commandSucceeded = (command, before, after) => {
+            switch (command) {
+            case "nextTrack":
+            case "previousTrack":
+              return !sameTrack(before, after);
+            case "play":
+            case "pause":
+            case "togglePlayPause":
+              return before.isPlaying !== after.isPlaying;
+            default:
+              return !sameTrack(before, after) || before.isPlaying !== after.isPlaying;
+            }
+          };
+          const candidateMatchers = {
+            play: [/^play$/i, /resume/i],
+            pause: [/^pause$/i],
+            nextTrack: [/next/i, /skip next/i, /next track/i, /next song/i],
+            previousTrack: [/previous/i, /prev/i, /back/i, /restart/i]
+          };
+          const isVisible = (element) => {
+            if (!element || !element.isConnected) {
+              return false;
+            }
+
+            const style = window.getComputedStyle(element);
+            if (style.display === "none" || style.visibility === "hidden") {
+              return false;
+            }
+
+            return Boolean(
+              element.offsetWidth ||
+              element.offsetHeight ||
+              element.getClientRects().length
+            );
+          };
+          const elementLabel = (element) => [
+            element.getAttribute("aria-label"),
+            element.getAttribute("title"),
+            element.getAttribute("name"),
+            element.getAttribute("data-testid"),
+            typeof element.className === "string" ? element.className : "",
+            typeof element.id === "string" ? element.id : "",
+            element.textContent
+          ]
+            .filter(Boolean)
+            .join(" ")
+            .replace(/\\s+/g, " ")
+            .trim();
+          const clickTransportControl = (command) => {
+            const matchers = candidateMatchers[command] ?? [];
+            if (!matchers.length) {
+              return false;
+            }
+
+            const candidates = Array.from(
+              document.querySelectorAll("button, [role='button'], a, input[type='button'], input[type='submit']")
+            );
+
+            for (const element of candidates) {
+              if (!isVisible(element) || element.disabled) {
+                continue;
+              }
+
+              const label = elementLabel(element);
+              if (!label || !matchers.some((matcher) => matcher.test(label))) {
+                continue;
+              }
+
+              element.click();
+              emitDiagnostics("Clicked DOM transport fallback.", {
+                command,
+                label
+              });
+              return true;
+            }
+
+            emitDiagnostics("No DOM transport fallback matched.", { command });
+            return false;
+          };
+          const applyMediaElementFallback = (command) => {
+            const media = document.querySelector("audio, video");
+            if (!(media instanceof HTMLMediaElement)) {
+              return false;
+            }
+
+            if (command === "play") {
+              media.play?.();
+              return true;
+            }
+
+            if (command === "pause") {
+              media.pause?.();
+              return true;
+            }
+
+            return false;
+          };
+          const dispatchRemoteCommand = (command) => {
+            const stateBefore = summarizeState();
+            emitDiagnostics("Received remote command.", {
+              command,
+              title: stateBefore.title,
+              artistName: stateBefore.artistName,
+              isPlaying: String(stateBefore.isPlaying)
+            });
+
+            window.dispatchEvent(new CustomEvent("mobileworm:remote-command", {
+              detail: { command }
+            }));
+
+            setTimeout(() => {
+              const stateAfter = summarizeState();
+              if (commandSucceeded(command, stateBefore, stateAfter)) {
+                emitDiagnostics("Remote command changed now playing state.", {
+                  command,
+                  title: stateAfter.title,
+                  artistName: stateAfter.artistName,
+                  isPlaying: String(stateAfter.isPlaying)
+                });
+                return;
+              }
+
+              if (clickTransportControl(command)) {
+                return;
+              }
+
+              if (applyMediaElementFallback(command)) {
+                emitDiagnostics("Applied media element fallback.", { command });
+              }
+            }, 250);
+          };
+          const nativeSetActionHandler = mediaSession?.setActionHandler?.bind(mediaSession);
+          const setActionHandler = (action, handler) => {
+            if (!nativeSetActionHandler) {
+              return;
+            }
+
+            try {
+              nativeSetActionHandler(action, handler);
+            } catch (_) {
+              return;
+            }
+          };
+          const configureActionHandlers = () => {
+            setActionHandler("play", () => dispatchRemoteCommand("play"));
+            setActionHandler("pause", () => dispatchRemoteCommand("pause"));
+            setActionHandler("nexttrack", () => dispatchRemoteCommand("nextTrack"));
+            setActionHandler("previoustrack", () => dispatchRemoteCommand("previousTrack"));
+            setActionHandler("seekforward", null);
+            setActionHandler("seekbackward", null);
+            setActionHandler("seekto", null);
+          };
+          const syncMediaSession = (payload) => {
+            lastNowPlayingState = {
+              title: payload.title ?? "",
+              artistName: payload.artistName ?? "",
+              isPlaying: Boolean(payload.isPlaying)
+            };
+            if (!mediaSession) {
+              return;
+            }
+            configureActionHandlers();
+
+            if (window.MediaMetadata) {
+              try {
+                mediaSession.metadata = new MediaMetadata({
+                  title: payload.title ?? "",
+                  artist: payload.artistName ?? "",
+                  album: payload.albumTitle ?? "",
+                  artwork: payload.artworkUrl ? [{ src: payload.artworkUrl }] : []
+                });
+              } catch (_) {
+                mediaSession.metadata = null;
+              }
+            }
+
+            if ("playbackState" in mediaSession) {
+              mediaSession.playbackState = payload.isPlaying ? "playing" : "paused";
+            }
+          };
+          const clearMediaSession = () => {
+            lastNowPlayingState = null;
+            if (!mediaSession) {
+              return;
+            }
+
+            try {
+              mediaSession.metadata = null;
+            } catch (_) {
+              return;
+            }
+
+            if ("playbackState" in mediaSession) {
+              mediaSession.playbackState = "none";
+            }
+          };
+
+          if (mediaSession && nativeSetActionHandler && !window.__mobilewormMediaSessionPatched) {
+            window.__mobilewormMediaSessionPatched = true;
+            mediaSession.setActionHandler = (action, handler) => {
+              switch (action) {
+              case "play":
+                return setActionHandler(action, () => dispatchRemoteCommand("play"));
+              case "pause":
+                return setActionHandler(action, () => dispatchRemoteCommand("pause"));
+              case "nexttrack":
+                return setActionHandler(action, () => dispatchRemoteCommand("nextTrack"));
+              case "previoustrack":
+                return setActionHandler(action, () => dispatchRemoteCommand("previousTrack"));
+              case "seekforward":
+              case "seekbackward":
+              case "seekto":
+                return setActionHandler(action, null);
+              default:
+                return setActionHandler(action, handler);
+              }
+            };
+          }
+
+          configureActionHandlers();
+
           window.__mobilewormNowPlaying = {
             update(payload) {
+              syncMediaSession(payload);
               nowPlayingHandler.postMessage({
                 action: "update",
                 ...payload
               });
             },
             clear() {
+              clearMediaSession();
               nowPlayingHandler.postMessage({ action: "clear" });
             }
           };
 
-          window.__mobilewormNowPlayingCommand = (command) => {
-            window.dispatchEvent(new CustomEvent("mobileworm:remote-command", {
-              detail: { command }
-            }));
-          };
+          window.__mobilewormNowPlayingCommand = dispatchRemoteCommand;
         })();
         """,
         injectionTime: .atDocumentStart,

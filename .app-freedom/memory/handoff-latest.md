@@ -2,15 +2,15 @@
 
 - App: mobileworm
 - From CLI: codex
-- Timestamp: 2026-04-20T18:43:20.736Z
+- Timestamp: 2026-04-21T02:59:30.558Z
 
 ## What Was Accomplished
 
-Removed the native floating settings gear and added a WKWebView developer bridge so EarWorm's mobile settings page can open the native diagnostics sheet on demand.
+Added remote-command fallback handling so lock-screen next/previous first dispatches the page event, then clicks matching DOM transport controls if the track does not actually change.
 
 ## Next Step
 
-Launch MobileWorm, confirm the floating gear no longer appears, then use EarWorm's settings page developer section to open diagnostics and verify native logs still appear.
+Launch MobileWorm, play a queue with multiple tracks, and verify lock-screen next/previous advances the queue instead of pausing the current song. Check MobileWorm diagnostics for remote_command entries if it still fails.
 
 ## Resume Instructions
 

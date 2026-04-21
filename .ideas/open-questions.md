@@ -12,6 +12,9 @@
 
 ## Implementation Safety
 
+- Added remote-command fallback handling so lock-screen next/previous first dispatches the page event, then clicks matching DOM transport controls if the track does not actually change.
+- Strengthened MobileWorm now-playing control overrides so the injected WKWebView bridge reclaims Media Session handlers from the page and native skip-interval commands route to next/previous track actions.
+- Patched MobileWorm now-playing integration so the WKWebView bridge advertises track-based media session actions and the native audio session publishes long-form audio playback state.
 - Removed the native floating settings gear and added a WKWebView developer bridge so EarWorm's mobile settings page can open the native diagnostics sheet on demand.
 - Moved MobileWorm diagnostics out of the global floating debug button and into a native Settings sheet under a Developer section. Added AppSettingsSheet with current server info and change-server action, replaced the root overlay icon with a settings gear, and verified in the iOS simulator that Settings opens first and Diagnostics launches from Developer.
 - Used the new diagnostics report to fix remaining MobileWorm integration issues. Patched EarwormWebView URL loading to normalize same-page URLs so the app stops reloading https://host and https://host/ as different pages, which was causing auth churn and repeated provisional navigations. Rebuilt simulator and security check passed.
@@ -29,6 +32,3 @@
 - Adjusted WKWebView safe-area behavior and moved the unauthenticated Change Server control into a bottom safeAreaInset so the wrapper no longer hard-codes bottom spacing.
 - Validated that mobileworm still reaches EarWorm's login UI and Change Server flow with the live host. Attempted to continue with the provided test credentials, but simulator automation could not reliably type into the WKWebView login fields, and the Cloudflare tunnel for earworm.sillytina.fun degraded to HTTP 502 during direct login verification.
 - If auth/status or auth/login start returning Cloudflare 502 during testing, stop attributing the failure to the app until the tunnel/origin is healthy again.
-- Live simulator validation now passes for https://earworm.sillytina.fun. The app validates the EarWorm server, saves it, opens EarWorm's existing mobile login UI in WKWebView with no native browser toolbar, and the login-screen Change EarWorm Server control returns to first-launch server entry. Replaced the unreliable DOM-injected change-server button with a native EarWorm-styled overlay shown only while unauthenticated.
-- If testing login-screen Change Server, use the accessibility label Change EarWorm Server; coordinate screenshots may not match AX coordinates in the WebView.
-- Validated provided EarWorm URL for mobileworm. Direct HTTPS initially returned EarWorm auth status, but the Cloudflare tunnel then began returning HTTP 530 / error 1033 for both curl and the iOS validator. mobileworm launched in the simulator, accepted the URL, and correctly stayed on first-launch with 'EarWorm returned HTTP 530.'

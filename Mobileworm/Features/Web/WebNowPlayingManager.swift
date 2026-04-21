@@ -81,6 +81,7 @@ final class WebNowPlayingManager {
             info[MPMediaItemPropertyArtwork] = cachedArtwork
         }
         MPNowPlayingInfoCenter.default().nowPlayingInfo = info
+        MPNowPlayingInfoCenter.default().playbackState = payload.isPlaying ? .playing : .paused
 
         guard let artworkURL = payload.artworkURL else {
             currentArtworkURLString = nil
@@ -113,6 +114,7 @@ final class WebNowPlayingManager {
         artworkTask?.cancel()
         currentArtworkURLString = nil
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+        MPNowPlayingInfoCenter.default().playbackState = .stopped
     }
 
     private func installArtwork(_ artwork: MPMediaItemArtwork, for urlString: String) {
@@ -131,6 +133,7 @@ final class WebNowPlayingManager {
             MPMediaItemPropertyTitle: payload.title,
             MPMediaItemPropertyArtist: payload.artistName,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: max(0, payload.position),
+            MPNowPlayingInfoPropertyDefaultPlaybackRate: 1.0,
             MPNowPlayingInfoPropertyPlaybackRate: payload.isPlaying ? 1.0 : 0.0,
             MPNowPlayingInfoPropertyMediaType: MPNowPlayingInfoMediaType.audio.rawValue,
         ]
@@ -149,7 +152,7 @@ final class WebNowPlayingManager {
     private func activateAudioSession() {
         let session = AVAudioSession.sharedInstance()
         do {
-            try session.setCategory(.playback, mode: .default)
+            try session.setCategory(.playback, mode: .default, policy: .longFormAudio)
             try session.setActive(true)
         } catch {
             return
@@ -164,16 +167,31 @@ final class WebNowPlayingManager {
         remoteCommandsConfigured = true
         let commandCenter = MPRemoteCommandCenter.shared()
 
+        resetCommand(commandCenter.playCommand)
+        resetCommand(commandCenter.pauseCommand)
+        resetCommand(commandCenter.togglePlayPauseCommand)
+        resetCommand(commandCenter.nextTrackCommand)
+        resetCommand(commandCenter.previousTrackCommand)
+        resetCommand(commandCenter.seekForwardCommand)
+        resetCommand(commandCenter.seekBackwardCommand)
+        resetCommand(commandCenter.skipForwardCommand)
+        resetCommand(commandCenter.skipBackwardCommand)
+        resetCommand(commandCenter.changePlaybackPositionCommand)
+
         commandCenter.playCommand.isEnabled = true
         commandCenter.pauseCommand.isEnabled = true
         commandCenter.togglePlayPauseCommand.isEnabled = true
         commandCenter.nextTrackCommand.isEnabled = true
         commandCenter.previousTrackCommand.isEnabled = true
 
+        // iOS may still surface skip-style transport buttons for web playback.
+        // Route those commands to track navigation so the controls behave like song skip.
         commandCenter.seekForwardCommand.isEnabled = false
         commandCenter.seekBackwardCommand.isEnabled = false
-        commandCenter.skipForwardCommand.isEnabled = false
-        commandCenter.skipBackwardCommand.isEnabled = false
+        commandCenter.skipForwardCommand.isEnabled = true
+        commandCenter.skipBackwardCommand.isEnabled = true
+        commandCenter.skipForwardCommand.preferredIntervals = [NSNumber(value: 10)]
+        commandCenter.skipBackwardCommand.preferredIntervals = [NSNumber(value: 10)]
         commandCenter.changePlaybackPositionCommand.isEnabled = false
 
         addCommandTarget(commandCenter.playCommand, command: "play")
@@ -181,6 +199,12 @@ final class WebNowPlayingManager {
         addCommandTarget(commandCenter.togglePlayPauseCommand, command: "togglePlayPause")
         addCommandTarget(commandCenter.nextTrackCommand, command: "nextTrack")
         addCommandTarget(commandCenter.previousTrackCommand, command: "previousTrack")
+        addCommandTarget(commandCenter.skipForwardCommand, command: "nextTrack")
+        addCommandTarget(commandCenter.skipBackwardCommand, command: "previousTrack")
+    }
+
+    private func resetCommand(_ remoteCommand: MPRemoteCommand) {
+        remoteCommand.removeTarget(nil)
     }
 
     private func addCommandTarget(_ remoteCommand: MPRemoteCommand, command: String) {
