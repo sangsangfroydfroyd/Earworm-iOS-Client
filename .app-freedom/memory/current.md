@@ -14,10 +14,10 @@ Not recorded.
 
 ## Recent Changes
 
-Added remote-command fallback handling so lock-screen next/previous first dispatches the page event, then clicks matching DOM transport controls if the track does not actually change.
+Added and verified debug-only MobileWorm offline search QA navigation hook for simulator testing after implementing EarWorm offline search fallback.
 
 Reason: Cross-CLI handoff — codex session ended.
-Outcome: Next step: Launch MobileWorm, play a queue with multiple tracks, and verify lock-screen next/previous advances the queue instead of pausing the current song. Check MobileWorm diagnostics for remote_command entries if it still fails.
+Outcome: Handoff recorded.
 - .app-freedom/memory/current.json
 - .app-freedom/memory/current.md
 - .app-freedom/memory/handoff-latest.md
@@ -26,17 +26,17 @@ Outcome: Next step: Launch MobileWorm, play a queue with multiple tracks, and ve
 - .app-freedom/memory/mempalace/status.json
 - .handoff.md
 - .ideas/open-questions.md
+- Mobileworm/App/AppModel.swift
 - Mobileworm/Features/Web/EarwormWebView.swift
+- Mobileworm/Features/Web/WebMetadataCache.swift
+- .app-freedom/memory/mempalace/events/2026-04-25T210615052Z-handoff-49ce8e/2026-04-25T21-06-15-052Z-handoff-2026-04-25T210615052Z-handoff-49ce8e.md
+- .app-freedom/memory/mempalace/events/2026-04-25T210615052Z-handoff-49ce8e/mempalace.yaml
+- mobileworm.xcodeproj/project.xcworkspace/xcuserdata/sangfroyd.xcuserdatad/UserInterfaceState.xcuserstate
+- .ideas/decision-log.md
 - Mobileworm/Features/Web/WebNowPlayingManager.swift
-- .app-freedom/memory/mempalace/events/2026-04-21T023604177Z-handoff-e9d48e/2026-04-21T02-36-04-178Z-handoff-2026-04-21T023604177Z-handoff-e9d48e.md
-- .app-freedom/memory/mempalace/events/2026-04-21T023604177Z-handoff-e9d48e/mempalace.yaml
-- Mobileworm/App/RootView.swift
 - Mobileworm/Features/Web/WebContainerView.swift
+- Mobileworm/App/RootView.swift
 - mobileworm.xcodeproj/project.pbxproj
-- .app-freedom/memory/mempalace/events/2026-04-20T060056379Z-handoff-8bd371/2026-04-20T06-00-56-380Z-handoff-2026-04-20T060056379Z-handoff-8bd371.md
-- .app-freedom/memory/mempalace/events/2026-04-20T060056379Z-handoff-8bd371/mempalace.yaml
-- .app-freedom/memory/mempalace/events/2026-04-20T180044004Z-handoff-317a0e/2026-04-20T18-00-44-005Z-handoff-2026-04-20T180044004Z-handoff-317a0e.md
-- .app-freedom/memory/mempalace/events/2026-04-20T180044004Z-handoff-317a0e/mempalace.yaml
 - Mobileworm/Shared/AppSettingsSheet.swift
 
 ## Decisions
@@ -63,6 +63,9 @@ Outcome: Next step: Launch MobileWorm, play a queue with multiple tracks, and ve
 
 ## Failed Attempts / Future-Self Notes
 
+- Added and verified debug-only MobileWorm offline search QA navigation hook for simulator testing after implementing EarWorm offline search fallback.
+- Implemented and verified offline MobileWorm playlist caching: native app-shell fallback, larger metadata cache, debug-gated QA playlist downloader, and offline simulator validation with downloaded AIFF files.
+- Implemented MobileWorm offline launch support: saved-server reconnect failures now enter the cached web UI, MobileWorm metadata cache accepts larger playlist responses, and EarWorm web client now registers a service worker, uses cached auth/data fallbacks, saves MobileWorm playback state, and refreshes playlist data on reconnect.
 - Added remote-command fallback handling so lock-screen next/previous first dispatches the page event, then clicks matching DOM transport controls if the track does not actually change.
 - Strengthened MobileWorm now-playing control overrides so the injected WKWebView bridge reclaims Media Session handlers from the page and native skip-interval commands route to next/previous track actions.
 - Patched MobileWorm now-playing integration so the WKWebView bridge advertises track-based media session actions and the native audio session publishes long-form audio playback state.
@@ -80,13 +83,10 @@ Outcome: Next step: Launch MobileWorm, play a queue with multiple tracks, and ve
 - Fixed remaining bottom safe-area bar by moving ignoresSafeArea(.container) onto the WKWebView itself, making the web content edge-to-edge on all sides while keeping native unauthenticated Change Server control in SwiftUI safe-area placement. iOS simulator build passed; mobileworm security scan had no findings.
 - Finished native fullscreen container follow-up. mobileworm WebContainerView now lets the WKWebView ignore the top safe area so Earworm can render edge-to-edge under the notch/status area. iOS simulator build passed and mobileworm security scan had no findings.
 - Made the one permitted mobileworm native-container edit: locked iPhone orientation to portrait in XcodeGen config, preserved signing team in project.yml, added WKWebView zoom/viewport suppression, regenerated the Xcode project, verified the built Info.plist orientation key, passed simulator build, and ran security check with no findings.
-- Adjusted WKWebView safe-area behavior and moved the unauthenticated Change Server control into a bottom safeAreaInset so the wrapper no longer hard-codes bottom spacing.
-- Validated that mobileworm still reaches EarWorm's login UI and Change Server flow with the live host. Attempted to continue with the provided test credentials, but simulator automation could not reliably type into the WKWebView login fields, and the Cloudflare tunnel for earworm.sillytina.fun degraded to HTTP 502 during direct login verification.
-- If auth/status or auth/login start returning Cloudflare 502 during testing, stop attributing the failure to the app until the tunnel/origin is healthy again.
 
 ## Next Step
 
-Launch MobileWorm, play a queue with multiple tracks, and verify lock-screen next/previous advances the queue instead of pausing the current song. Check MobileWorm diagnostics for remote_command entries if it still fails.
+Run an end-to-end simulator pass against a live EarWorm server: launch online, visit/download a playlist, force offline, relaunch MobileWorm, and confirm the cached UI plus downloaded playback work.
 
 ## Warning
 

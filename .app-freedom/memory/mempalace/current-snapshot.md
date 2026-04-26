@@ -1,8 +1,8 @@
 # App Freedom Compatibility Snapshot: mobileworm
 
-Generated: 2026-04-21T02:59:30.551Z
+Generated: 2026-04-25T22:57:07.923Z
 Configured backend: mempalace
-Active backend: mempalace
+Active backend: app_freedom
 
 This file remains as a deterministic App Freedom resume snapshot while MemPalace is the primary long-term memory backend.
 
@@ -16,6 +16,6 @@ Not recorded.
 
 ## Latest Change
 
-Added remote-command fallback handling so lock-screen next/previous first dispatches the page event, then clicks matching DOM transport controls if the track does not actually change.
+Added and verified debug-only MobileWorm offline search QA navigation hook for simulator testing after implementing EarWorm offline search fallback.
 
-Next step: Launch MobileWorm, play a queue with multiple tracks, and verify lock-screen next/previous advances the queue instead of pausing the current song. Check MobileWorm diagnostics for remote_command entries if it still fails.
+Next step: Run an end-to-end simulator pass against a live EarWorm server: launch online, visit/download a playlist, force offline, relaunch MobileWorm, and confirm the cached UI plus downloaded playback work.

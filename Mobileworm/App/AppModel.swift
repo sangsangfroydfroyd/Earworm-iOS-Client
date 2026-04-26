@@ -152,6 +152,24 @@ final class AppModel {
             )
         } catch {
             let message = Self.message(for: error)
+            if let savedServer = savedServerStore.load() {
+                activeServer = savedServer
+                serverInput = savedServer.baseURL
+                destination = .web
+                diagnostics.updateDestination(Self.describeDestination(.web))
+                diagnostics.updateServerURL(savedServer.baseURL)
+                diagnostics.record(
+                    .warning,
+                    category: "reconnect",
+                    message: "Saved EarWorm server revalidation failed; opening cached web UI.",
+                    metadata: [
+                        "serverURL": baseURL,
+                        "error": message,
+                    ]
+                )
+                return
+            }
+
             destination = .recovery(message)
             diagnostics.updateDestination(Self.describeDestination(.recovery(message)))
             diagnostics.markLoadFailure(message)

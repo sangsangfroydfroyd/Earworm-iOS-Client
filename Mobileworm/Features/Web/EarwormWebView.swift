@@ -784,6 +784,8 @@ struct EarwormWebView: UIViewRepresentable {
         private var loadingURL: String?
         private var debugCookieSeededHost: String?
         private var debugCookieSeedingInFlight = false
+        private var debugDownloadPlaylistIdsStarted: Set<Int> = []
+        private var debugSearchQueryApplied = false
         weak var webView: WKWebView?
 
         init(
@@ -908,6 +910,9 @@ struct EarwormWebView: UIViewRepresentable {
             loadingURL = webView.url?.absoluteString
             webView.evaluateJavaScript("window.__mobilewormBridgeSync?.()")
             syncDebugBrowserSessionIfNeeded(in: webView)
+            runDebugPlaylistDownloadIfNeeded(in: webView)
+            runDebugSearchNavigationIfNeeded(in: webView)
+            refreshCachedAppShellIfNeeded(for: webView.url)
             updateSnapshot(for: webView)
             Self.recordDiagnostic(
                 .info,
@@ -917,6 +922,29 @@ struct EarwormWebView: UIViewRepresentable {
                     "url": webView.url?.absoluteString ?? "unknown",
                     "title": webView.title ?? "",
                 ]
+            )
+        }
+
+        func webView(
+            _ webView: WKWebView,
+            decidePolicyFor navigationResponse: WKNavigationResponse,
+            decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void
+        ) {
+            guard
+                navigationResponse.isForMainFrame,
+                let httpResponse = navigationResponse.response as? HTTPURLResponse,
+                httpResponse.statusCode >= 500,
+                let failedURL = httpResponse.url
+            else {
+                decisionHandler(.allow)
+                return
+            }
+
+            decisionHandler(.cancel)
+            loadCachedAppShellFallback(
+                in: webView,
+                url: failedURL,
+                reason: "HTTP \(httpResponse.statusCode)"
             )
         }
 
@@ -1357,6 +1385,11 @@ struct EarwormWebView: UIViewRepresentable {
             }
 
             let message = error.localizedDescription
+            if let webView, let failedURL = webView.url ?? URL(string: loadingURL ?? "") {
+                loadCachedAppShellFallback(in: webView, url: failedURL, reason: message)
+                return
+            }
+
             EarwormWebView.diagnostics.markLoadFailure(message)
             Self.recordDiagnostic(
                 .error,
@@ -1365,6 +1398,58 @@ struct EarwormWebView: UIViewRepresentable {
                 metadata: ["error": message]
             )
             onLoadFailure(error.localizedDescription)
+        }
+
+        private func refreshCachedAppShellIfNeeded(for url: URL?) {
+            guard
+                let url,
+                let scheme = url.scheme?.lowercased(),
+                scheme == "https" || scheme == "http"
+            else {
+                return
+            }
+
+            Task {
+                await WebAppShellCache.shared.refresh(from: url)
+            }
+        }
+
+        private func loadCachedAppShellFallback(in webView: WKWebView, url: URL, reason: String) {
+            Self.recordDiagnostic(
+                .warning,
+                category: "webview",
+                message: "Attempting cached EarWorm app shell fallback.",
+                metadata: [
+                    "url": url.absoluteString,
+                    "reason": reason,
+                ]
+            )
+
+            Task {
+                guard let cachedHTML = await WebAppShellCache.shared.cachedHTML(for: url) else {
+                    await MainActor.run {
+                        EarwormWebView.diagnostics.markLoadFailure(reason)
+                        Self.recordDiagnostic(
+                            .error,
+                            category: "webview",
+                            message: "No cached EarWorm app shell was available.",
+                            metadata: ["url": url.absoluteString]
+                        )
+                        onLoadFailure(reason)
+                    }
+                    return
+                }
+
+                await MainActor.run {
+                    webView.loadHTMLString(cachedHTML, baseURL: url)
+                    Self.recordDiagnostic(
+                        .info,
+                        category: "webview",
+                        message: "Loaded cached EarWorm app shell fallback.",
+                        metadata: ["url": url.absoluteString]
+                    )
+                }
+            }
         }
 
         private func syncDebugBrowserSessionIfNeeded(in webView: WKWebView) {
@@ -1417,6 +1502,163 @@ struct EarwormWebView: UIViewRepresentable {
 
             webView.evaluateJavaScript(script)
         }
+
+        private func runDebugPlaylistDownloadIfNeeded(in webView: WKWebView) {
+            #if DEBUG
+            guard
+                let rawPlaylistId = ProcessInfo.processInfo.environment["EARWORM_QA_DOWNLOAD_PLAYLIST_ID"],
+                let playlistId = Int(rawPlaylistId),
+                !debugDownloadPlaylistIdsStarted.contains(playlistId)
+            else {
+                return
+            }
+
+            debugDownloadPlaylistIdsStarted.insert(playlistId)
+            Self.recordDiagnostic(
+                .info,
+                category: "qa",
+                message: "Starting debug playlist download through MobileWorm bridge.",
+                metadata: ["playlistId": String(playlistId)]
+            )
+
+            guard let baseURL = webView.url else {
+                Self.recordDiagnostic(
+                    .error,
+                    category: "qa",
+                    message: "Debug playlist download failed before WebView URL was available.",
+                    metadata: ["playlistId": String(playlistId)]
+                )
+                return
+            }
+
+            Task {
+                await runDebugNativePlaylistDownload(playlistId: playlistId, baseURL: baseURL)
+            }
+            #endif
+        }
+
+        private func runDebugSearchNavigationIfNeeded(in webView: WKWebView) {
+            #if DEBUG
+            guard
+                !debugSearchQueryApplied,
+                let rawQuery = ProcessInfo.processInfo.environment["EARWORM_QA_SEARCH_QUERY"]?
+                    .trimmingCharacters(in: .whitespacesAndNewlines),
+                !rawQuery.isEmpty
+            else {
+                return
+            }
+
+            debugSearchQueryApplied = true
+            let encodedQuery = rawQuery.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? rawQuery
+            let script = """
+            (() => {
+              const path = `/search?q=\(encodedQuery)`;
+              window.history.pushState({}, "", path);
+              window.dispatchEvent(new PopStateEvent("popstate", { state: {} }));
+            })();
+            """
+
+            Self.recordDiagnostic(
+                .info,
+                category: "qa",
+                message: "Navigating to debug offline search query.",
+                metadata: ["query": rawQuery]
+            )
+            webView.evaluateJavaScript(script)
+            #endif
+        }
+
+        #if DEBUG
+        private func runDebugNativePlaylistDownload(playlistId: Int, baseURL: URL) async {
+            do {
+                guard
+                    let token = ProcessInfo.processInfo.environment["EARWORM_SESSION_TOKEN"]?
+                        .trimmingCharacters(in: .whitespacesAndNewlines),
+                    !token.isEmpty,
+                    let manifestURL = URL(
+                        string: "/api/download/playlists/\(playlistId)/manifest",
+                        relativeTo: baseURL
+                    )?.absoluteURL,
+                    let cookie = Self.debugSessionCookie(token: token, url: manifestURL)
+                else {
+                    throw DebugPlaylistDownloadError.missingSession
+                }
+
+                var request = URLRequest(url: manifestURL)
+                request.setValue("earworm_session=\(token)", forHTTPHeaderField: "Cookie")
+                let (data, response) = try await URLSession.shared.data(for: request)
+                guard
+                    let httpResponse = response as? HTTPURLResponse,
+                    (200...299).contains(httpResponse.statusCode)
+                else {
+                    throw DebugPlaylistDownloadError.invalidManifestResponse
+                }
+
+                let manifest = try JSONDecoder().decode(DebugPlaylistDownloadManifest.self, from: data)
+                let tracks = manifest.tracks.compactMap { track -> WebPlaylistTrackDownloadRequest? in
+                    guard
+                        let sourceURL = URL(string: track.url, relativeTo: baseURL)?.absoluteURL
+                    else {
+                        return nil
+                    }
+
+                    return WebPlaylistTrackDownloadRequest(
+                        trackId: track.trackId,
+                        sourceURL: sourceURL,
+                        filename: track.filename,
+                        cookies: [cookie]
+                    )
+                }
+
+                let downloadedPlaylist = try await WebDownloadManager.shared.downloadPlaylist(
+                    named: manifest.playlistName,
+                    playlistId: manifest.playlistId,
+                    tracks: tracks
+                )
+
+                await MainActor.run {
+                    Self.recordDiagnostic(
+                        .info,
+                        category: "qa",
+                        message: "Debug playlist download finished.",
+                        metadata: [
+                            "playlistId": String(playlistId),
+                            "savedCount": String(downloadedPlaylist.savedCount),
+                            "skippedCount": String(downloadedPlaylist.skippedCount),
+                            "path": downloadedPlaylist.url.path,
+                        ]
+                    )
+                }
+            } catch {
+                await MainActor.run {
+                    Self.recordDiagnostic(
+                        .error,
+                        category: "qa",
+                        message: "Debug playlist download failed.",
+                        metadata: [
+                            "playlistId": String(playlistId),
+                            "error": error.localizedDescription,
+                        ]
+                    )
+                }
+            }
+        }
+
+        private static func debugSessionCookie(token: String, url: URL) -> HTTPCookie? {
+            guard let host = url.host else {
+                return nil
+            }
+
+            return HTTPCookie(properties: [
+                .domain: host,
+                .path: "/api",
+                .name: EarwormWebView.debugSessionCookieName,
+                .value: token,
+                .secure: (url.scheme?.lowercased() == "https"),
+                .expires: Date(timeIntervalSinceNow: 60 * 60 * 24 * 30),
+            ])
+        }
+        #endif
 
         private func handleDiagnosticsMessage(_ body: [String: Any]) {
             let event = (body["event"] as? String) ?? "unknown"
@@ -1573,3 +1815,31 @@ struct EarwormWebView: UIViewRepresentable {
         }
     }
 }
+
+#if DEBUG
+private struct DebugPlaylistDownloadManifest: Decodable {
+    let playlistId: Int
+    let playlistName: String
+    let tracks: [DebugPlaylistDownloadTrack]
+}
+
+private struct DebugPlaylistDownloadTrack: Decodable {
+    let trackId: Int
+    let filename: String
+    let url: String
+}
+
+private enum DebugPlaylistDownloadError: LocalizedError {
+    case missingSession
+    case invalidManifestResponse
+
+    var errorDescription: String? {
+        switch self {
+        case .missingSession:
+            return "The debug playlist downloader could not find a session token or manifest URL."
+        case .invalidManifestResponse:
+            return "The playlist manifest request did not return a successful HTTP response."
+        }
+    }
+}
+#endif
