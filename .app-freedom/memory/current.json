@@ -12,13 +12,13 @@
     "stage": "",
     "status": ""
   },
-  "latest_change_summary": "Added and verified debug-only MobileWorm offline search QA navigation hook for simulator testing after implementing EarWorm offline search fallback.",
+  "latest_change_summary": "Fixed transfer progress banner flicker by animating only visibility changes, generation-guarding delayed hides, and batching concurrent artwork cache misses into one stable image progress session. Verified with xcodebuild, security check, and fresh simulator artwork-cache reload screenshots.",
   "latest_reason": "Cross-CLI handoff — codex session ended.",
   "latest_outcome": "Handoff recorded.",
   "blockers": [],
   "unresolved_issues": [],
   "resolved_items": [],
-  "next_recommended_step": "Run an end-to-end simulator pass against a live EarWorm server: launch online, visit/download a playlist, force offline, relaunch MobileWorm, and confirm the cached UI plus downloaded playback work.",
+  "next_recommended_step": "Optional follow-up: test with an authenticated session that allows /api/albums and /api/artists so the launch-time full-library sync/prune path can be observed directly.",
   "recent_files_touched": [
     ".app-freedom/memory/current.json",
     ".app-freedom/memory/current.md",
@@ -28,18 +28,18 @@
     ".app-freedom/memory/mempalace/status.json",
     ".handoff.md",
     ".ideas/open-questions.md",
-    "Mobileworm/App/AppModel.swift",
-    "Mobileworm/Features/Web/EarwormWebView.swift",
-    "Mobileworm/Features/Web/WebMetadataCache.swift",
-    ".app-freedom/memory/mempalace/events/2026-04-25T210615052Z-handoff-49ce8e/2026-04-25T21-06-15-052Z-handoff-2026-04-25T210615052Z-handoff-49ce8e.md",
-    ".app-freedom/memory/mempalace/events/2026-04-25T210615052Z-handoff-49ce8e/mempalace.yaml",
-    "mobileworm.xcodeproj/project.xcworkspace/xcuserdata/sangfroyd.xcuserdatad/UserInterfaceState.xcuserstate",
-    ".ideas/decision-log.md",
-    "Mobileworm/Features/Web/WebNowPlayingManager.swift",
-    "Mobileworm/Features/Web/WebContainerView.swift",
     "Mobileworm/App/RootView.swift",
+    "Mobileworm/Features/Web/EarwormWebView.swift",
+    "Mobileworm/Features/Web/WebDownloadManager.swift",
     "mobileworm.xcodeproj/project.pbxproj",
-    "Mobileworm/Shared/AppSettingsSheet.swift"
+    ".app-freedom/memory/mempalace/events/2026-04-29T045001899Z-handoff-e17495/2026-04-29T04-50-01-900Z-handoff-2026-04-29T045001899Z-handoff-e17495.md",
+    ".app-freedom/memory/mempalace/events/2026-04-29T045001899Z-handoff-e17495/mempalace.yaml",
+    ".app-freedom/memory/mempalace/events/2026-04-29T050529685Z-handoff-d27e66/2026-04-29T05-05-29-695Z-handoff-2026-04-29T050529685Z-handoff-d27e66.md",
+    ".app-freedom/memory/mempalace/events/2026-04-29T050529685Z-handoff-d27e66/mempalace.yaml",
+    "Mobileworm/Features/Web/WebImageCache.swift",
+    "Mobileworm/Shared/TransferProgressView.swift",
+    "Mobileworm/App/AppModel.swift",
+    "Mobileworm/Features/Web/WebMetadataCache.swift"
   ],
   "recent_decisions": [
     "Use a native EarWorm-styled login-screen Change Server overlay instead of injecting a DOM button, because the DOM button rendered in WKWebView but simulator taps did not fire its click handler reliably.",
@@ -60,6 +60,10 @@
   ],
   "failed_attempts": [],
   "future_self_notes": [
+    "Fixed transfer progress banner flicker by animating only visibility changes, generation-guarding delayed hides, and batching concurrent artwork cache misses into one stable image progress session. Verified with xcodebuild, security check, and fresh simulator artwork-cache reload screenshots.",
+    "Added top drop-down transfer progress banner for artwork cache checks/downloads and song downloads. Build, security check, simulator launch, and forced image-cache progress visual verification passed.",
+    "Tested MobileWorm persistent artwork image cache in the iPhone 17 Pro simulator. The app launched to the EarWorm Home screen, artwork rendered, Caches/EarwormImageCache was created with manifest.json plus four optimized 700x700 JPEG files, and relaunching kept the same four cache files without duplicate growth.",
+    "Implemented persistent optimized MobileWorm artwork caching: WKWebView artwork image loads now route through a native mobileworm-image-cache URL scheme, images are stored in the app cache as downscaled/compressed local files, launch-time library sync detects album/artist artwork set changes, prefetches new artwork, and prunes stale cache entries.",
     "Added and verified debug-only MobileWorm offline search QA navigation hook for simulator testing after implementing EarWorm offline search fallback.",
     "Implemented and verified offline MobileWorm playlist caching: native app-shell fallback, larger metadata cache, debug-gated QA playlist downloader, and offline simulator validation with downloaded AIFF files.",
     "Implemented MobileWorm offline launch support: saved-server reconnect failures now enter the cached web UI, MobileWorm metadata cache accepts larger playlist responses, and EarWorm web client now registers a service worker, uses cached auth/data fallbacks, saves MobileWorm playback state, and refreshes playlist data on reconnect.",
@@ -75,19 +79,15 @@
     "Added native WKWebView bridges for original track downloads and lock-screen now-playing metadata/artwork. Downloads use authenticated URLSession writes into Documents/EarWorm Downloads exposed through Files; Info.plist now enables file sharing, opening in place, and audio background mode. Validated with xcodegen, iOS simulator build, built Info.plist inspection, and scoped security checks.",
     "Removed the brittle WKWebView artwork interception that blanked EarWorm images and replaced it with a native metadata cache bridge. MobileWorm now injects a bridge for cached EarWorm JSON payloads, persists those snapshots in the app cache directory, keeps native safe-area handling intact, and surfaces EarWorm branding in the iOS shell. Xcode 26.4 build passed, mobileworm security scan had no findings, and the simulator now renders the real EarWorm Home screen with artwork tiles again.",
     "Added a launch-scoped native artwork cache for the iOS wrapper, wired WKWebView image requests through a custom earworm-cache URL scheme, clear the cache on every app bootstrap, and renamed the built iOS product/display name to EarWorm while keeping the repo/app id mobileworm. Rebuilt with Xcode 26.4, security check passed, installed/launched on the iPhone 17 Pro simulator, and confirmed the renamed bootstrap screen appears.",
-    "Fixed MobileWorm bottom safe-area behavior by disabling WKWebView UIScrollView automatic content inset adjustment and zeroing native scroll/content insets on create/update. Built with Xcode 26.4, security scan had no findings, installed/launched on iPhone 17 Pro simulator, and captured /tmp/mobileworm-safe-area.png showing the embedded Earworm bottom nav background reaches the physical bottom edge.",
-    "Tightened fullscreen fit after bottom safe-area remained visible. Web destination now ignores safe areas at the RootView route level, RootView hides navigation toolbar and paints a safe fallback background, and WebContainerView uses overlay instead of safeAreaInset for unauthenticated Change Server so the WKWebView is no longer resized by native bottom insets. Simulator build/run and screenshot sanity check passed; security scan had no findings.",
-    "Fixed remaining bottom safe-area bar by moving ignoresSafeArea(.container) onto the WKWebView itself, making the web content edge-to-edge on all sides while keeping native unauthenticated Change Server control in SwiftUI safe-area placement. iOS simulator build passed; mobileworm security scan had no findings.",
-    "Finished native fullscreen container follow-up. mobileworm WebContainerView now lets the WKWebView ignore the top safe area so Earworm can render edge-to-edge under the notch/status area. iOS simulator build passed and mobileworm security scan had no findings.",
-    "Made the one permitted mobileworm native-container edit: locked iPhone orientation to portrait in XcodeGen config, preserved signing team in project.yml, added WKWebView zoom/viewport suppression, regenerated the Xcode project, verified the built Info.plist orientation key, passed simulator build, and ran security check with no findings."
+    "Fixed MobileWorm bottom safe-area behavior by disabling WKWebView UIScrollView automatic content inset adjustment and zeroing native scroll/content insets on create/update. Built with Xcode 26.4, security scan had no findings, installed/launched on iPhone 17 Pro simulator, and captured /tmp/mobileworm-safe-area.png showing the embedded Earworm bottom nav background reaches the physical bottom edge."
   ],
   "last_checkpoint_at": "2026-04-18T01:47:18.364Z",
   "last_session_end_at": "",
-  "last_event_id": "2026-04-25T225707553Z-handoff-168776",
-  "last_event_at": "2026-04-25T22:57:07.553Z",
+  "last_event_id": "2026-04-29T231244326Z-handoff-e22274",
+  "last_event_at": "2026-04-29T23:12:44.330Z",
   "last_recorded_fingerprint": {
     "kind": "git-status",
-    "value": "574e3b907bc035f9737905ea5c480d7998d278ded9b4d4bf0aa039286ea91f60",
+    "value": "60cf491f4f8697828d391c8010786d760c7b27a7515085768b918e7bd6c43632",
     "dirty": true,
     "changed_files": [
       ".app-freedom/memory/current.json",
@@ -98,13 +98,22 @@
       ".app-freedom/memory/mempalace/status.json",
       ".handoff.md",
       ".ideas/open-questions.md",
-      "Mobileworm/App/AppModel.swift",
+      "Mobileworm/App/RootView.swift",
       "Mobileworm/Features/Web/EarwormWebView.swift",
-      "Mobileworm/Features/Web/WebMetadataCache.swift",
-      ".app-freedom/memory/mempalace/events/2026-04-25T210615052Z-handoff-49ce8e/2026-04-25T21-06-15-052Z-handoff-2026-04-25T210615052Z-handoff-49ce8e.md",
-      ".app-freedom/memory/mempalace/events/2026-04-25T210615052Z-handoff-49ce8e/mempalace.yaml"
+      "Mobileworm/Features/Web/WebDownloadManager.swift",
+      "mobileworm.xcodeproj/project.pbxproj",
+      ".app-freedom/memory/mempalace/events/2026-04-29T045001899Z-handoff-e17495/2026-04-29T04-50-01-900Z-handoff-2026-04-29T045001899Z-handoff-e17495.md",
+      ".app-freedom/memory/mempalace/events/2026-04-29T045001899Z-handoff-e17495/mempalace.yaml",
+      ".app-freedom/memory/mempalace/events/2026-04-29T050529685Z-handoff-d27e66/2026-04-29T05-05-29-695Z-handoff-2026-04-29T050529685Z-handoff-d27e66.md",
+      ".app-freedom/memory/mempalace/events/2026-04-29T050529685Z-handoff-d27e66/mempalace.yaml",
+      ".app-freedom/memory/mempalace/events/2026-04-29T184833959Z-handoff-72a46c/2026-04-29T18-48-33-959Z-handoff-2026-04-29T184833959Z-handoff-72a46c.md",
+      ".app-freedom/memory/mempalace/events/2026-04-29T184833959Z-handoff-72a46c/mempalace.yaml",
+      ".app-freedom/memory/mempalace/events/2026-04-29T231244326Z-handoff-e22274/2026-04-29T23-12-44-330Z-handoff-2026-04-29T231244326Z-handoff-e22274.md",
+      ".app-freedom/memory/mempalace/events/2026-04-29T231244326Z-handoff-e22274/mempalace.yaml",
+      "Mobileworm/Features/Web/WebImageCache.swift",
+      "Mobileworm/Shared/TransferProgressView.swift"
     ],
-    "captured_at": "2026-04-25T22:57:07.864Z"
+    "captured_at": "2026-04-29T23:13:05.838Z"
   },
   "warning": {
     "unlogged_changes": false,
@@ -117,13 +126,20 @@
       ".app-freedom/memory/mempalace/status.json",
       ".handoff.md",
       ".ideas/open-questions.md",
-      "Mobileworm/App/AppModel.swift",
+      "Mobileworm/App/RootView.swift",
       "Mobileworm/Features/Web/EarwormWebView.swift",
-      "Mobileworm/Features/Web/WebMetadataCache.swift",
-      ".app-freedom/memory/mempalace/events/2026-04-25T210615052Z-handoff-49ce8e/2026-04-25T21-06-15-052Z-handoff-2026-04-25T210615052Z-handoff-49ce8e.md",
-      ".app-freedom/memory/mempalace/events/2026-04-25T210615052Z-handoff-49ce8e/mempalace.yaml"
+      "Mobileworm/Features/Web/WebDownloadManager.swift",
+      "mobileworm.xcodeproj/project.pbxproj",
+      ".app-freedom/memory/mempalace/events/2026-04-29T045001899Z-handoff-e17495/2026-04-29T04-50-01-900Z-handoff-2026-04-29T045001899Z-handoff-e17495.md",
+      ".app-freedom/memory/mempalace/events/2026-04-29T045001899Z-handoff-e17495/mempalace.yaml",
+      ".app-freedom/memory/mempalace/events/2026-04-29T050529685Z-handoff-d27e66/2026-04-29T05-05-29-695Z-handoff-2026-04-29T050529685Z-handoff-d27e66.md",
+      ".app-freedom/memory/mempalace/events/2026-04-29T050529685Z-handoff-d27e66/mempalace.yaml",
+      ".app-freedom/memory/mempalace/events/2026-04-29T184833959Z-handoff-72a46c/2026-04-29T18-48-33-959Z-handoff-2026-04-29T184833959Z-handoff-72a46c.md",
+      ".app-freedom/memory/mempalace/events/2026-04-29T184833959Z-handoff-72a46c/mempalace.yaml",
+      ".app-freedom/memory/mempalace/events/2026-04-29T231244326Z-handoff-e22274/2026-04-29T23-12-44-330Z-handoff-2026-04-29T231244326Z-handoff-e22274.md",
+      ".app-freedom/memory/mempalace/events/2026-04-29T231244326Z-handoff-e22274/mempalace.yaml"
     ],
     "message": ""
   },
-  "updated_at": "2026-04-25T22:57:07.725Z"
+  "updated_at": "2026-04-29T23:13:05.253Z"
 }

@@ -1,8 +1,8 @@
 # App Freedom Compatibility Snapshot: mobileworm
 
-Generated: 2026-04-25T22:57:07.923Z
+Generated: 2026-04-29T23:13:06.170Z
 Configured backend: mempalace
-Active backend: app_freedom
+Active backend: mempalace
 
 This file remains as a deterministic App Freedom resume snapshot while MemPalace is the primary long-term memory backend.
 
@@ -16,6 +16,6 @@ Not recorded.
 
 ## Latest Change
 
-Added and verified debug-only MobileWorm offline search QA navigation hook for simulator testing after implementing EarWorm offline search fallback.
+Fixed transfer progress banner flicker by animating only visibility changes, generation-guarding delayed hides, and batching concurrent artwork cache misses into one stable image progress session. Verified with xcodebuild, security check, and fresh simulator artwork-cache reload screenshots.
 
-Next step: Run an end-to-end simulator pass against a live EarWorm server: launch online, visit/download a playlist, force offline, relaunch MobileWorm, and confirm the cached UI plus downloaded playback work.
+Next step: Optional follow-up: test with an authenticated session that allows /api/albums and /api/artists so the launch-time full-library sync/prune path can be observed directly.

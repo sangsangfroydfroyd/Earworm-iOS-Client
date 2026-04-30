@@ -33,13 +33,38 @@ actor WebDownloadManager {
 
     func downloadTrack(from sourceURL: URL, filename: String, cookies: [HTTPCookie], trackId: Int?) async throws -> DownloadedTrackFile {
         let downloadsDirectory = try ensureDownloadsDirectory()
-        return try await downloadTrack(
-            from: sourceURL,
-            filename: filename,
-            cookies: cookies,
-            trackId: trackId,
-            destinationDirectory: downloadsDirectory
+        await reportSongProgress(
+            .start,
+            detail: "Starting \(filename)",
+            completed: 0,
+            total: 1
         )
+        do {
+            let downloadedFile = try await downloadTrack(
+                from: sourceURL,
+                filename: filename,
+                cookies: cookies,
+                trackId: trackId,
+                destinationDirectory: downloadsDirectory,
+                progressDetail: "Downloading \(filename)"
+            )
+            await reportSongProgress(
+                .finish,
+                detail: "Downloaded \(downloadedFile.filename)",
+                completed: 1,
+                total: 1
+            )
+            return downloadedFile
+        } catch {
+            await reportSongProgress(
+                .finish,
+                detail: "Song download failed",
+                completed: 1,
+                total: 1,
+                failed: true
+            )
+            throw error
+        }
     }
 
     func downloadPlaylist(
@@ -56,27 +81,62 @@ actor WebDownloadManager {
 
         var savedCount = 0
         var skippedCount = 0
-        for track in tracks {
+        await reportSongProgress(
+            .start,
+            detail: tracks.isEmpty ? "Preparing playlist folder" : "Starting playlist download",
+            completed: 0,
+            total: max(tracks.count, 1)
+        )
+        for (index, track) in tracks.enumerated() {
             do {
                 _ = try await downloadTrack(
                     from: track.sourceURL,
                     filename: track.filename,
                     cookies: track.cookies,
                     trackId: track.trackId,
-                    destinationDirectory: folderURL
+                    destinationDirectory: folderURL,
+                    progressDetail: "Downloading song \(index + 1) of \(tracks.count)",
+                    progressCompleted: index,
+                    progressTotal: max(tracks.count, 1)
                 )
                 savedCount += 1
+                await reportSongProgress(
+                    .update,
+                    detail: "Saved song \(index + 1) of \(tracks.count)",
+                    completed: index + 1,
+                    total: max(tracks.count, 1)
+                )
             } catch {
                 skippedCount += 1
+                await reportSongProgress(
+                    .update,
+                    detail: "Skipped song \(index + 1) of \(tracks.count)",
+                    completed: index + 1,
+                    total: max(tracks.count, 1)
+                )
             }
         }
 
         guard savedCount > 0 || tracks.isEmpty else {
+            await reportSongProgress(
+                .finish,
+                detail: "Playlist download failed",
+                completed: max(tracks.count, 1),
+                total: max(tracks.count, 1),
+                failed: true
+            )
             throw WebDownloadManagerError.noPlaylistTracksSaved
         }
         if let playlistId {
             storeDownloadedPlaylist(playlistId: playlistId, folderURL: folderURL)
         }
+
+        await reportSongProgress(
+            .finish,
+            detail: "Downloaded \(savedCount) song\(savedCount == 1 ? "" : "s")",
+            completed: max(tracks.count, 1),
+            total: max(tracks.count, 1)
+        )
 
         return DownloadedPlaylistFolder(
             playlistId: playlistId,
@@ -92,7 +152,10 @@ actor WebDownloadManager {
         filename: String,
         cookies: [HTTPCookie],
         trackId: Int?,
-        destinationDirectory: URL
+        destinationDirectory: URL,
+        progressDetail: String?,
+        progressCompleted: Int? = nil,
+        progressTotal: Int? = nil
     ) async throws -> DownloadedTrackFile {
         var request = URLRequest(url: sourceURL)
         request.cachePolicy = .reloadIgnoringLocalCacheData
@@ -102,7 +165,20 @@ actor WebDownloadManager {
             request.setValue(cookieHeader, forHTTPHeaderField: "Cookie")
         }
 
-        let (temporaryURL, response) = try await URLSession.shared.download(for: request)
+        if let progressDetail {
+            await reportSongProgress(
+                .update,
+                detail: progressDetail,
+                completed: progressCompleted ?? 0,
+                total: progressTotal
+            )
+        }
+        let (temporaryURL, response) = try await downloadTemporaryFile(
+            for: request,
+            progressDetail: progressDetail,
+            progressCompleted: progressCompleted,
+            progressTotal: progressTotal
+        )
         guard let httpResponse = response as? HTTPURLResponse else {
             throw WebDownloadManagerError.invalidResponse
         }
@@ -272,6 +348,164 @@ actor WebDownloadManager {
     private func localPlaybackURL(trackId: Int, filename: String) -> String {
         let encodedFilename = filename.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? "track"
         return "mobileworm-download://track/\(trackId)/\(encodedFilename)"
+    }
+
+    private func downloadTemporaryFile(
+        for request: URLRequest,
+        progressDetail: String?,
+        progressCompleted: Int?,
+        progressTotal: Int?
+    ) async throws -> (URL, URLResponse) {
+        let delegate = ProgressReportingDownloadDelegate { [self] bytesWritten, bytesExpected in
+            guard bytesExpected > 0 else {
+                return
+            }
+
+            let trackFraction = min(1, max(0, Double(bytesWritten) / Double(bytesExpected)))
+            let percent = Int((trackFraction * 100).rounded())
+            let detail = progressDetail.map { "\($0) - \(percent)%" } ?? "Downloading song - \(percent)%"
+            let total = progressTotal ?? 1
+            let completed = progressCompleted ?? 0
+            let combinedFraction: Double
+            let label: String
+
+            if total > 1 {
+                combinedFraction = min(1, (Double(completed) + trackFraction) / Double(total))
+                label = "\(min(completed + 1, total))/\(total)"
+            } else {
+                combinedFraction = trackFraction
+                label = "\(percent)%"
+            }
+
+            await reportSongProgress(
+                .update,
+                detail: detail,
+                completed: completed,
+                total: total,
+                progressFraction: combinedFraction,
+                progressLabel: label
+            )
+        }
+        let session = URLSession(configuration: .default, delegate: delegate, delegateQueue: nil)
+        defer { session.invalidateAndCancel() }
+        return try await delegate.download(request, using: session)
+    }
+
+    private enum ProgressEvent {
+        case start
+        case update
+        case finish
+    }
+
+    private func reportSongProgress(
+        _ event: ProgressEvent,
+        detail: String,
+        completed: Int,
+        total: Int?,
+        failed: Bool = false,
+        progressFraction: Double? = nil,
+        progressLabel: String? = nil
+    ) async {
+        await MainActor.run {
+            switch event {
+            case .start:
+                TransferProgressStore.shared.start(
+                    .songs,
+                    title: "Song downloads",
+                    detail: detail,
+                    completed: completed,
+                    total: total,
+                    progressFraction: progressFraction,
+                    progressLabel: progressLabel
+                )
+            case .update:
+                TransferProgressStore.shared.update(
+                    .songs,
+                    title: "Song downloads",
+                    detail: detail,
+                    completed: completed,
+                    total: total,
+                    progressFraction: progressFraction,
+                    progressLabel: progressLabel
+                )
+            case .finish:
+                TransferProgressStore.shared.finish(.songs, detail: detail, failed: failed)
+            }
+        }
+    }
+}
+
+private final class ProgressReportingDownloadDelegate: NSObject, URLSessionDownloadDelegate {
+    typealias ProgressHandler = @Sendable (_ bytesWritten: Int64, _ bytesExpected: Int64) async -> Void
+
+    private let progressHandler: ProgressHandler
+    private var continuation: CheckedContinuation<(URL, URLResponse), Error>?
+    private var downloadedURL: URL?
+    private var completionError: Error?
+    private var progressTask: Task<Void, Never>?
+
+    init(progressHandler: @escaping ProgressHandler) {
+        self.progressHandler = progressHandler
+    }
+
+    func download(_ request: URLRequest, using session: URLSession) async throws -> (URL, URLResponse) {
+        try await withCheckedThrowingContinuation { continuation in
+            self.continuation = continuation
+            session.downloadTask(with: request).resume()
+        }
+    }
+
+    func urlSession(
+        _ session: URLSession,
+        downloadTask: URLSessionDownloadTask,
+        didWriteData bytesWritten: Int64,
+        totalBytesWritten: Int64,
+        totalBytesExpectedToWrite: Int64
+    ) {
+        guard totalBytesExpectedToWrite > 0 else {
+            return
+        }
+
+        progressTask?.cancel()
+        progressTask = Task {
+            await progressHandler(totalBytesWritten, totalBytesExpectedToWrite)
+        }
+    }
+
+    func urlSession(
+        _ session: URLSession,
+        downloadTask: URLSessionDownloadTask,
+        didFinishDownloadingTo location: URL
+    ) {
+        let copyURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathExtension(location.pathExtension.isEmpty ? "download" : location.pathExtension)
+
+        do {
+            try FileManager.default.copyItem(at: location, to: copyURL)
+            downloadedURL = copyURL
+        } catch {
+            completionError = error
+        }
+    }
+
+    func urlSession(
+        _ session: URLSession,
+        task: URLSessionTask,
+        didCompleteWithError error: Error?
+    ) {
+        progressTask?.cancel()
+
+        if let error {
+            continuation?.resume(throwing: error)
+        } else if let completionError {
+            continuation?.resume(throwing: completionError)
+        } else if let downloadedURL, let response = task.response {
+            continuation?.resume(returning: (downloadedURL, response))
+        } else {
+            continuation?.resume(throwing: URLError(.cannotCreateFile))
+        }
+        continuation = nil
     }
 }
 

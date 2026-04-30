@@ -7,45 +7,49 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		034634E395EA461C9F4D97D9 /* DiagnosticsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C088FD4A7D1BEBE92EFCFA /* DiagnosticsSheet.swift */; };
 		08E28C6112053299D8051AE6 /* SavedServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35F45F7AF4965A1B63E7FE19 /* SavedServer.swift */; };
-		0F1D4BAA8A7B4AFBA8A14A11 /* AppDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F1D4BA98A7B4AFBA8A14A11 /* AppDiagnostics.swift */; };
-		126FAD7536E3735EF1B6DCAA /* AppSettingsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 126FAD7436E3735EF1B6DCAA /* AppSettingsSheet.swift */; };
+		2A080DC9C13AC20CFE82205E /* TransferProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A12FB9EED95928DB7AFD3D /* TransferProgressView.swift */; };
 		34F58BEFA6489F8AE7DAED21 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94926CF37F414D7B7D428488 /* LoadingView.swift */; };
 		35535DF731838CCD49E7F333 /* WebNowPlayingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DF66FB86E633E625016F16 /* WebNowPlayingManager.swift */; };
 		405CDFE07E689DCEC1EE80F5 /* RecoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A267C2E6989D83617639A4 /* RecoveryView.swift */; };
 		458FF766296E62BD5C7413DD /* SavedServerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2FF2B802AF4631BA00B461 /* SavedServerStore.swift */; };
+		4CC4B759BD4AC41E69B89DB8 /* AppSettingsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9C7967899261CAE0D16A0A /* AppSettingsSheet.swift */; };
 		54251596EA98C853D1E956FB /* EarwormWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA57464664F6CE62C53EF40 /* EarwormWebView.swift */; };
 		7E50CB4933429A3A5F9507C2 /* WebDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 391190BF7C324C8924114B2C /* WebDownloadManager.swift */; };
 		7EC3C9EE4D7447D9B1820ECD /* WebContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F31A3186D561435410A00AA1 /* WebContainerView.swift */; };
 		9A0937DB392382AB5CD6882A /* ConnectServerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3F270529C78FF226D2E3510 /* ConnectServerView.swift */; };
+		B23A961530403D86DBA84357 /* AppDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA5FE25815B244EB7145675 /* AppDiagnostics.swift */; };
 		C9FF435ACFF765ACEAEE0E5D /* WebMetadataCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 690230D296E2F217324D0ECC /* WebMetadataCache.swift */; };
 		CA4C605E049BE5EF68220B53 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42CE9DD8647ECBB940FCE688 /* AppModel.swift */; };
+		CB4A8772CFD911AD8CDF7464 /* WebImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = F30992BC868ED3FE03DD5226 /* WebImageCache.swift */; };
 		CC49C95B233AD3838F9ABD4D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3BFF0BB0E06D312DD6B515E8 /* Assets.xcassets */; };
 		D4DBD0F919D9D8CB3A92354B /* MobilewormApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E716B5AB2D89DB67665E918 /* MobilewormApp.swift */; };
-		D4DBD0FA19D9D8CB3A92354B /* DiagnosticsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4DBD0FB19D9D8CB3A92354B /* DiagnosticsSheet.swift */; };
 		D762B2C46D7A9E3077084116 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551B3098790B88827ED3D54B /* RootView.swift */; };
 		EB357829FB86542DA5CB25F0 /* ServerValidationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695729A4BE43908834C96F13 /* ServerValidationService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0B9C7967899261CAE0D16A0A /* AppSettingsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsSheet.swift; sourceTree = "<group>"; };
 		0E716B5AB2D89DB67665E918 /* MobilewormApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobilewormApp.swift; sourceTree = "<group>"; };
-		0F1D4BA98A7B4AFBA8A14A11 /* AppDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDiagnostics.swift; sourceTree = "<group>"; };
-		126FAD7436E3735EF1B6DCAA /* AppSettingsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsSheet.swift; sourceTree = "<group>"; };
 		35F45F7AF4965A1B63E7FE19 /* SavedServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedServer.swift; sourceTree = "<group>"; };
 		391190BF7C324C8924114B2C /* WebDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDownloadManager.swift; sourceTree = "<group>"; };
 		3BFF0BB0E06D312DD6B515E8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		42CE9DD8647ECBB940FCE688 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		551B3098790B88827ED3D54B /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		58A12FB9EED95928DB7AFD3D /* TransferProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferProgressView.swift; sourceTree = "<group>"; };
 		690230D296E2F217324D0ECC /* WebMetadataCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebMetadataCache.swift; sourceTree = "<group>"; };
 		695729A4BE43908834C96F13 /* ServerValidationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerValidationService.swift; sourceTree = "<group>"; };
 		6D916B06156254B41175A3CE /* mobileworm.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = mobileworm.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		94926CF37F414D7B7D428488 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
+		A4C088FD4A7D1BEBE92EFCFA /* DiagnosticsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsSheet.swift; sourceTree = "<group>"; };
+		ABA5FE25815B244EB7145675 /* AppDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDiagnostics.swift; sourceTree = "<group>"; };
 		CD2FF2B802AF4631BA00B461 /* SavedServerStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedServerStore.swift; sourceTree = "<group>"; };
 		D3F270529C78FF226D2E3510 /* ConnectServerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectServerView.swift; sourceTree = "<group>"; };
-		D4DBD0FB19D9D8CB3A92354B /* DiagnosticsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsSheet.swift; sourceTree = "<group>"; };
 		DA44DC59A86ACFDF8CEC9A73 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		DCA57464664F6CE62C53EF40 /* EarwormWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EarwormWebView.swift; sourceTree = "<group>"; };
 		E9A267C2E6989D83617639A4 /* RecoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryView.swift; sourceTree = "<group>"; };
+		F30992BC868ED3FE03DD5226 /* WebImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebImageCache.swift; sourceTree = "<group>"; };
 		F31A3186D561435410A00AA1 /* WebContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebContainerView.swift; sourceTree = "<group>"; };
 		F7DF66FB86E633E625016F16 /* WebNowPlayingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebNowPlayingManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -84,6 +88,7 @@
 				DCA57464664F6CE62C53EF40 /* EarwormWebView.swift */,
 				F31A3186D561435410A00AA1 /* WebContainerView.swift */,
 				391190BF7C324C8924114B2C /* WebDownloadManager.swift */,
+				F30992BC868ED3FE03DD5226 /* WebImageCache.swift */,
 				690230D296E2F217324D0ECC /* WebMetadataCache.swift */,
 				F7DF66FB86E633E625016F16 /* WebNowPlayingManager.swift */,
 			);
@@ -149,10 +154,11 @@
 		FC4DEAABD1CADC0E263CCC99 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				0F1D4BA98A7B4AFBA8A14A11 /* AppDiagnostics.swift */,
-				126FAD7436E3735EF1B6DCAA /* AppSettingsSheet.swift */,
-				D4DBD0FB19D9D8CB3A92354B /* DiagnosticsSheet.swift */,
+				ABA5FE25815B244EB7145675 /* AppDiagnostics.swift */,
+				0B9C7967899261CAE0D16A0A /* AppSettingsSheet.swift */,
+				A4C088FD4A7D1BEBE92EFCFA /* DiagnosticsSheet.swift */,
 				94926CF37F414D7B7D428488 /* LoadingView.swift */,
+				58A12FB9EED95928DB7AFD3D /* TransferProgressView.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -227,11 +233,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B23A961530403D86DBA84357 /* AppDiagnostics.swift in Sources */,
 				CA4C605E049BE5EF68220B53 /* AppModel.swift in Sources */,
-				0F1D4BAA8A7B4AFBA8A14A11 /* AppDiagnostics.swift in Sources */,
-				126FAD7536E3735EF1B6DCAA /* AppSettingsSheet.swift in Sources */,
+				4CC4B759BD4AC41E69B89DB8 /* AppSettingsSheet.swift in Sources */,
 				9A0937DB392382AB5CD6882A /* ConnectServerView.swift in Sources */,
-				D4DBD0FA19D9D8CB3A92354B /* DiagnosticsSheet.swift in Sources */,
+				034634E395EA461C9F4D97D9 /* DiagnosticsSheet.swift in Sources */,
 				54251596EA98C853D1E956FB /* EarwormWebView.swift in Sources */,
 				34F58BEFA6489F8AE7DAED21 /* LoadingView.swift in Sources */,
 				D4DBD0F919D9D8CB3A92354B /* MobilewormApp.swift in Sources */,
@@ -240,8 +246,10 @@
 				08E28C6112053299D8051AE6 /* SavedServer.swift in Sources */,
 				458FF766296E62BD5C7413DD /* SavedServerStore.swift in Sources */,
 				EB357829FB86542DA5CB25F0 /* ServerValidationService.swift in Sources */,
+				2A080DC9C13AC20CFE82205E /* TransferProgressView.swift in Sources */,
 				7EC3C9EE4D7447D9B1820ECD /* WebContainerView.swift in Sources */,
 				7E50CB4933429A3A5F9507C2 /* WebDownloadManager.swift in Sources */,
+				CB4A8772CFD911AD8CDF7464 /* WebImageCache.swift in Sources */,
 				C9FF435ACFF765ACEAEE0E5D /* WebMetadataCache.swift in Sources */,
 				35535DF731838CCD49E7F333 /* WebNowPlayingManager.swift in Sources */,
 			);

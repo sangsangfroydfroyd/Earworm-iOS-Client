@@ -4,6 +4,7 @@ struct RootView: View {
     @Bindable var appModel: AppModel
     @Environment(\.openURL) private var openURL
     @State private var isShowingDiagnostics = false
+    @State private var transferProgressStore = TransferProgressStore.shared
 
     var body: some View {
         NavigationStack {
@@ -56,6 +57,11 @@ struct RootView: View {
         }
         .toolbar(.hidden, for: .navigationBar)
         .background(Color(red: 0.039, green: 0.039, blue: 0.039).ignoresSafeArea())
+        .overlay(alignment: .top) {
+            TransferProgressBanner(store: transferProgressStore)
+                .padding(.horizontal, 12)
+                .safeAreaPadding(.top, 8)
+        }
         .sheet(isPresented: $isShowingDiagnostics) {
             DiagnosticsSheet(diagnostics: AppDiagnosticsStore.shared)
         }

@@ -30,7 +30,12 @@ struct EarwormWebView: UIViewRepresentable {
             MobilewormDownloadSchemeHandler(),
             forURLScheme: "mobileworm-download"
         )
+        configuration.setURLSchemeHandler(
+            MobilewormImageCacheSchemeHandler(),
+            forURLScheme: "mobileworm-image-cache"
+        )
         configuration.userContentController.addUserScript(Self.viewportLockScript)
+        configuration.userContentController.addUserScript(Self.imageCacheBridgeScript)
         configuration.userContentController.addUserScript(Self.bridgeScript)
         configuration.userContentController.addUserScript(Self.metadataCacheBridgeScript)
         configuration.userContentController.addUserScript(Self.downloadBridgeScript)
@@ -186,6 +191,111 @@ struct EarwormWebView: UIViewRepresentable {
               });
             }
           };
+        })();
+        """,
+        injectionTime: .atDocumentStart,
+        forMainFrameOnly: true
+    )
+
+    private static let imageCacheBridgeScript = WKUserScript(
+        source: """
+        (() => {
+          if (window.__mobilewormImageCacheBridgeInstalled) {
+            return;
+          }
+
+          window.__mobilewormImageCacheBridgeInstalled = true;
+          const cacheSchemePrefix = "mobileworm-image-cache:";
+          const artworkPathPattern = /^\\/api\\/artwork\\/(album|artist)\\/\\d+$/;
+
+          const cachedArtworkURL = (value) => {
+            if (!value || typeof value !== "string" || value.startsWith(cacheSchemePrefix)) {
+              return value;
+            }
+
+            let url;
+            try {
+              url = new URL(value, document.baseURI || window.location.href);
+            } catch {
+              return value;
+            }
+
+            if (
+              url.origin !== window.location.origin ||
+              !artworkPathPattern.test(url.pathname)
+            ) {
+              return value;
+            }
+
+            return `mobileworm-image-cache://image?url=${encodeURIComponent(url.href)}`;
+          };
+
+          const rewriteImage = (image) => {
+            if (!(image instanceof HTMLImageElement)) {
+              return;
+            }
+
+            const rawSource = image.getAttribute("src");
+            const cachedSource = cachedArtworkURL(rawSource);
+            if (cachedSource && cachedSource !== rawSource) {
+              image.setAttribute("src", cachedSource);
+            }
+          };
+
+          const srcDescriptor = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, "src");
+          if (srcDescriptor?.get && srcDescriptor?.set) {
+            Object.defineProperty(HTMLImageElement.prototype, "src", {
+              configurable: true,
+              enumerable: srcDescriptor.enumerable,
+              get() {
+                return srcDescriptor.get.call(this);
+              },
+              set(value) {
+                return srcDescriptor.set.call(this, cachedArtworkURL(value));
+              }
+            });
+          }
+
+          const nativeSetAttribute = Element.prototype.setAttribute;
+          Element.prototype.setAttribute = function(name, value) {
+            if (this instanceof HTMLImageElement && String(name).toLowerCase() === "src") {
+              return nativeSetAttribute.call(this, name, cachedArtworkURL(String(value)));
+            }
+            return nativeSetAttribute.apply(this, arguments);
+          };
+
+          const scan = (root = document) => {
+            if (root instanceof HTMLImageElement) {
+              rewriteImage(root);
+              return;
+            }
+            root.querySelectorAll?.("img[src]").forEach(rewriteImage);
+          };
+
+          new MutationObserver((mutations) => {
+            for (const mutation of mutations) {
+              if (mutation.type === "attributes") {
+                rewriteImage(mutation.target);
+                continue;
+              }
+              mutation.addedNodes.forEach((node) => {
+                if (node instanceof Element) {
+                  scan(node);
+                }
+              });
+            }
+          }).observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ["src"],
+            childList: true,
+            subtree: true
+          });
+
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", () => scan(), { once: true });
+          } else {
+            scan();
+          }
         })();
         """,
         injectionTime: .atDocumentStart,
@@ -786,6 +896,7 @@ struct EarwormWebView: UIViewRepresentable {
         private var debugCookieSeedingInFlight = false
         private var debugDownloadPlaylistIdsStarted: Set<Int> = []
         private var debugSearchQueryApplied = false
+        private var imageCacheSyncStartedRoots: Set<String> = []
         weak var webView: WKWebView?
 
         init(
@@ -913,6 +1024,7 @@ struct EarwormWebView: UIViewRepresentable {
             runDebugPlaylistDownloadIfNeeded(in: webView)
             runDebugSearchNavigationIfNeeded(in: webView)
             refreshCachedAppShellIfNeeded(for: webView.url)
+            syncImageCacheIfNeeded(for: webView.url)
             updateSnapshot(for: webView)
             Self.recordDiagnostic(
                 .info,
@@ -1414,6 +1526,41 @@ struct EarwormWebView: UIViewRepresentable {
             }
         }
 
+        private func syncImageCacheIfNeeded(for url: URL?) {
+            guard
+                let url,
+                let scheme = url.scheme?.lowercased(),
+                scheme == "https" || scheme == "http",
+                let rootURL = rootURL(for: url)
+            else {
+                return
+            }
+
+            let rootKey = rootURL.absoluteString
+            guard !imageCacheSyncStartedRoots.contains(rootKey) else {
+                return
+            }
+
+            imageCacheSyncStartedRoots.insert(rootKey)
+            Self.recordDiagnostic(
+                .info,
+                category: "image_cache",
+                message: "Starting MobileWorm artwork cache sync.",
+                metadata: ["serverURL": rootKey]
+            )
+
+            Task {
+                let cookies = await cookies(for: rootURL)
+                await WebImageCache.shared.syncLibraryArtwork(from: rootURL, cookies: cookies)
+                Self.recordDiagnostic(
+                    .info,
+                    category: "image_cache",
+                    message: "Finished MobileWorm artwork cache sync.",
+                    metadata: ["serverURL": rootKey]
+                )
+            }
+        }
+
         private func loadCachedAppShellFallback(in webView: WKWebView, url: URL, reason: String) {
             Self.recordDiagnostic(
                 .warning,
@@ -1450,6 +1597,17 @@ struct EarwormWebView: UIViewRepresentable {
                     )
                 }
             }
+        }
+
+        private func rootURL(for url: URL) -> URL? {
+            guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+                return nil
+            }
+
+            components.path = "/"
+            components.query = nil
+            components.fragment = nil
+            return components.url
         }
 
         private func syncDebugBrowserSessionIfNeeded(in webView: WKWebView) {
